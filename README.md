@@ -4,6 +4,12 @@ A browser simulation of ice-nine, the seed crystal from Kurt Vonnegut's *Cat's C
 that freezes water at 45.8 °C, spreading through the world's oceans, plus a paper and a
 website with the results. Live at <https://ice9.world> (simulation at <https://ice9.world/sim/>).
 
+<p align="center">
+  <img src="docs/img/anim_sinks_globe.webp" width="320" alt="Sinking ice-nine over the first 15 days: the sea turns milky as crystals spread, the land turns white">
+  <img src="docs/img/anim_floats_globe.webp" width="320" alt="Floating ice-nine over the first 15 days: a white crust spreads over the sea">
+  <br><em>The first 15 days in natural colour: sinking ice-nine (left), floating (right).</em>
+</p>
+
 Drop a seed in the water and watch the lattice advance. Freezing releases latent heat
 into the water, so each column stops at its melting point: the ocean stalls near 39%
 frozen within a week, then freezes about 0.4 percentage points a year. Sea spray lofts
