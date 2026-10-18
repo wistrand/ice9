@@ -68,3 +68,12 @@ python3 tools/build_data.py
 
 `paper/ice9.tex` builds with pdfLaTeX. To rerun every simulation behind it (hours to days), see
 [tools/runs/README.md](tools/runs/README.md).
+
+## License
+
+Code, website text and the paper: Copyright 2026 Erik Wistrand, licensed under the
+[Apache License, Version 2.0](LICENSE).
+
+The data files in `docs/sim/data/` are derived from the sources above and keep their terms:
+`precip.bin` is derived from GPCC data (Deutscher Wetterdienst, CC BY 4.0), the rest from
+Natural Earth and NOAA data.
