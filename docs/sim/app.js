@@ -1692,14 +1692,24 @@ function globeToCell(x, y) {
   const r = Math.min(H-1, Math.max(0, Math.floor((0.5-lat/Math.PI)*H)));
   return [q, r, cc];
 }
-function blitGlobe() {
-  const cw = mapCanvas.width, ch = mapCanvas.height;
-  if (!globeImg || globeImg.width !== cw || globeImg.height !== ch) globeImg = mapCtx.createImageData(cw, ch);
-  const out = globeImg.data;
-  out.fill(0);
-  const R = globeRadius(), cx = cw/2, cy = ch/2, sinLat0 = Math.sin(lat0), cosLat0 = Math.cos(lat0), cellsPerGrid = BR/RES, riverPx = riverImg ? riverImg.data : null;
+// the projection from screen pixels to the grid depends only on the view, the canvas and the grid, not on the state: it is computed once per
+// view (globeMap) and each frame only copies colours. Per visible pixel: its offset, its grid cell, its base-grid cell (satellite and rivers)
+// and the limb darkening, with the same arithmetic as the per-pixel projection, so the picture is identical.
+let globeKey = '', globeN = 0, globePix = null, globeCell = null, globeBase = null, globeLimb = null;
+function globeMap(cw, ch) {
+  const R = globeRadius(), key = [cw, ch, R, lon0, lat0, W, H, BW, BH].join();
+  if (key === globeKey) return;
+  globeKey = key;
+  const cx = cw/2, cy = ch/2, sinLat0 = Math.sin(lat0), cosLat0 = Math.cos(lat0);
   const x0 = Math.max(0, Math.floor(cx-R)), x1 = Math.min(cw, Math.ceil(cx+R)), y0 = Math.max(0, Math.floor(cy-R)),
-    y1 = Math.min(ch, Math.ceil(cy+R));
+    y1 = Math.min(ch, Math.ceil(cy+R)), cap = Math.max(1, (x1-x0)*(y1-y0));
+  if (!globePix || globePix.length < cap) {
+    globePix = new Int32Array(cap);
+    globeCell = new Int32Array(cap);
+    globeBase = new Int32Array(cap);
+    globeLimb = new Float64Array(cap);
+  }
+  let n = 0;
   for (let y = y0; y < y1; y++) {
     const Y = (cy-y)/R;
     for (let x = x0; x < x1; x++) {
@@ -1712,35 +1722,51 @@ function blitGlobe() {
       let q = Math.floor(((lon/Math.PI+1)/2)*W)%W;
       if (q < 0) q += W;
       const r = Math.min(H-1, Math.max(0, Math.floor((0.5-lat/Math.PI)*H)));
-      const o = (r*W+q)*4, p = (y*cw+x)*4;
-      let red = gridPx[o], green = gridPx[o+1], blue = gridPx[o+2];
-      if (satPixels && satelliteCk.checked) {
-        const baseQ = Math.min(BW-1, Math.floor(((lon/Math.PI+1)/2)*BW+BW)%BW), baseR = Math.min(BH-1, Math.max(0, Math.floor((0.5-lat/Math.PI)*BH)));
-        const satIdx = (baseR*BW+baseQ)*4, alpha = gridPx[o+3]/255;
-        red = satPixels[satIdx]*(1-alpha)+red*alpha;
-        green = satPixels[satIdx+1]*(1-alpha)+green*alpha;
-        blue = satPixels[satIdx+2]*(1-alpha)+blue*alpha;
-      }
-      if (riverPx) {
-        const baseQ = Math.min(BW-1, Math.floor(((lon/Math.PI+1)/2)*BW+BW)%BW), baseR = Math.min(BH-1, Math.max(0, Math.floor((0.5-lat/Math.PI)*BH)));
-        const rivIdx = (baseR*BW+baseQ)*4, alpha = riverPx[rivIdx+3]/255;
-        if (alpha > 0) {
-          red += (riverPx[rivIdx]-red)*alpha;
-          green += (riverPx[rivIdx+1]-green)*alpha;
-          blue += (riverPx[rivIdx+2]-blue)*alpha;
-        }
-      }
-      if (satPixels && satelliteCk.checked && nightMask && nightMask[r*W+q]) {
-        red *= 0.62;
-        green *= 0.66;
-        blue *= 0.78;
-      }
-      const limb = 0.55+0.45*cc;
-      out[p] = red*limb;
-      out[p+1] = green*limb;
-      out[p+2] = blue*limb;
-      out[p+3] = 255;
+      const baseQ = Math.min(BW-1, Math.floor(((lon/Math.PI+1)/2)*BW+BW)%BW), baseR = Math.min(BH-1, Math.max(0, Math.floor((0.5-lat/Math.PI)*BH)));
+      globePix[n] = (y*cw+x)*4;
+      globeCell[n] = r*W+q;
+      globeBase[n] = (baseR*BW+baseQ)*4;
+      globeLimb[n] = 0.55+0.45*cc;
+      n++;
     }
+  }
+  globeN = n;
+}
+function blitGlobe() {
+  const cw = mapCanvas.width, ch = mapCanvas.height;
+  if (!globeImg || globeImg.width !== cw || globeImg.height !== ch) globeImg = mapCtx.createImageData(cw, ch);
+  const out = globeImg.data;
+  out.fill(0);
+  globeMap(cw, ch);
+  const R = globeRadius(), cx = cw/2, cy = ch/2, sinLat0 = Math.sin(lat0), cosLat0 = Math.cos(lat0), riverPx = riverImg ? riverImg.data : null,
+    satOn = !!(satPixels && satelliteCk.checked);
+  for (let k = 0; k < globeN; k++) {
+    const cell = globeCell[k], o = cell*4, p = globePix[k], b = globeBase[k];
+    let red = gridPx[o], green = gridPx[o+1], blue = gridPx[o+2];
+    if (satOn) {
+      const alpha = gridPx[o+3]/255;
+      red = satPixels[b]*(1-alpha)+red*alpha;
+      green = satPixels[b+1]*(1-alpha)+green*alpha;
+      blue = satPixels[b+2]*(1-alpha)+blue*alpha;
+    }
+    if (riverPx) {
+      const alpha = riverPx[b+3]/255;
+      if (alpha > 0) {
+        red += (riverPx[b]-red)*alpha;
+        green += (riverPx[b+1]-green)*alpha;
+        blue += (riverPx[b+2]-blue)*alpha;
+      }
+    }
+    if (satOn && nightMask && nightMask[cell]) {
+      red *= 0.62;
+      green *= 0.66;
+      blue *= 0.78;
+    }
+    const limb = globeLimb[k];
+    out[p] = red*limb;
+    out[p+1] = green*limb;
+    out[p+2] = blue*limb;
+    out[p+3] = 255;
   }
   mapCtx.setTransform(1, 0, 0, 1, 0, 0);
   mapCtx.clearRect(0, 0, cw, ch);
@@ -2339,13 +2365,19 @@ mapBox.addEventListener('wheel', e => {
   setZoom(zoom*(e.deltaY < 0 ? 1.15 : 1/1.15), x, y);
   }, {passive:false});
 // ===== main loop and start-up =====
-let lastStatsAt = 0, lastDrawAt = 0;
+// repaint at most every 45 ms, and no more often than keeps repainting under about a fifth of the time: on fine grids or slow devices a
+// repaint (per-cell colours, plus the globe) can cost a large share of a short tick, and the model should get the time
+const DRAW_SHARE = 0.2;
+let lastStatsAt = 0, lastDrawAt = 0, drawCost = 0;
 function loop(ts) {
   if (running) {
     tick();
-    if (ts-lastDrawAt > 45) {
+    const now = performance.now();
+    if (now-lastDrawAt > Math.max(45, drawCost/DRAW_SHARE)) {
       draw();
-      lastDrawAt = ts;
+      const done = performance.now();
+      drawCost = drawCost ? 0.7*drawCost+0.3*(done-now) : done-now; // smoothed, so one slow frame does not stall the picture
+      lastDrawAt = now;
     }
     if (ts-lastStatsAt > 250) {
       stats();

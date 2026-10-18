@@ -24,6 +24,7 @@ pdfLaTeX. `work/` is not committed.
 | `ebhost.mjs`     | energy budget residual (`ebudget.mjs`)                                              |
 | `mbhost.mjs`     | salt change and water held as snow (`mbudget.mjs`)                                  |
 | `siterender.mjs` | website stills and animation frames                                                 |
+| `globetest.mjs`  | pixel hash of the globe across views and display options, and its draw time         |
 | `bitwise.mjs`    | SHA-256 of every state array after N seeded steps: compare before and after changes |
 
 The tables in `work/` are pasted into `paper/ice9.tex` by hand, and the numbers in the paper text and on the website
