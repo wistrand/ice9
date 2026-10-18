@@ -25,14 +25,14 @@ because the 1 km land mask is loaded whole.
 
 | Input                            | URL                                                                                                     | Licence                    |
 |----------------------------------|---------------------------------------------------------------------------------------------------------|----------------------------|
-| GLOBE 1 km land/ocean mask       | `global-land-mask` package, `globe_combined_mask_compressed.npz` on GitHub (toddkarin/global-land-mask) | public domain (NOAA GLOBE) |
+| GLOBE 1 km land/ocean mask       | `global-land-mask` package, `globe_combined_mask_compressed.npz` on GitHub (toddkarin/global-land-mask) | public domain (US); cite   |
 | Natural Earth 10m bathymetry     | `naturalearth.s3.amazonaws.com/10m_physical/ne_10m_bathymetry_all.zip`                                  | public domain              |
 | Natural Earth 10m lakes          | `naturalearth.s3.amazonaws.com/10m_physical/ne_10m_lakes.zip`                                           | public domain              |
 | Natural Earth 10m rivers         | `naturalearth.s3.amazonaws.com/10m_physical/ne_10m_rivers_lake_centerlines.zip`                         | public domain              |
-| ETOPO1 ice-surface colour relief | `www.ngdc.noaa.gov/mgg/image/color_etopo1_ice_low.jpg` (5400x2700)                                      | public domain (NOAA)       |
+| ETOPO1 ice-surface colour relief | `www.ngdc.noaa.gov/mgg/image/color_etopo1_ice_low.jpg` (5400x2700)                                      | public domain (US); cite   |
 | GPCC climatology V2025, 1°       | `opendata.dwd.de/climate_environment/GPCC/...climatology_1971_2000_v2025_100.nc.gz` (3 MB)              | CC BY 4.0 (DWD); cite      |
 
-Exact URLs are in `SOURCES` in the script. Natural Earth is public domain. The GLOBE and ETOPO1 entries assume US-government public domain; their licence terms have not been checked. GPCC is DWD open data under CC BY 4.0 (dwd.de/copyright): reuse and redistribution allowed with a source note, and the dataset asks to be cited as Rustemeier, Finger, Schirmeister, Ziese (2025), doi:10.5676/DWD_GPCC/CLIMAT_V2025_100. The website and README carry the credit. Never switch back to WorldClim: its terms forbid redistribution without permission, which a derived grid in a public `docs/` would break.
+Exact URLs are in `SOURCES` in the script. Natural Earth is public domain. ETOPO1 is not subject to copyright in the United States (NCEI metadata record gov.noaa.ngdc.mgg.dem:316); NCEI asks for the citation Amante and Eakins 2009, doi:10.7289/V5C8276M, which the README and website carry. GLOBE is likewise not subject to copyright in the United States (NCEI record gov.noaa.ngdc.mgg.dem:280; cite Hastings and Dunbar 1999, doi:10.7289/V52R3PMS). The `global-land-mask` package that repackages it is MIT-licensed; only `cells.bin`, derived from it, is redistributed. GPCC is DWD open data under CC BY 4.0 (dwd.de/copyright): reuse and redistribution allowed with a source note, and the dataset asks to be cited as Rustemeier, Finger, Schirmeister, Ziese (2025), doi:10.5676/DWD_GPCC/CLIMAT_V2025_100. The website and README carry the credit. Never switch back to WorldClim: its terms forbid redistribution without permission, which a derived grid in a public `docs/` would break.
 
 ## cells.bin derivation
 

@@ -57,11 +57,11 @@ Requires a browser with `DecompressionStream` (Chrome 80+, Firefox 113+, Safari 
 
 ## Data sources
 
-Natural Earth is public domain; GLOBE and ETOPO1 are NOAA products (licence terms not checked); GPCC is Deutscher Wetterdienst open data under CC BY 4.0.
+Natural Earth is public domain. GLOBE and ETOPO1 are US government data, not subject to copyright in the United States; NOAA asks that they be cited. GPCC is Deutscher Wetterdienst open data under CC BY 4.0.
 
-- Coastlines: the NOAA GLOBE 1 km land mask, via the [global-land-mask](https://github.com/toddkarin/global-land-mask) package.
+- Coastlines: the NOAA GLOBE 1 km land mask (GLOBE Task Team, Hastings and Dunbar 1999, doi:10.7289/V52R3PMS), via the [global-land-mask](https://github.com/toddkarin/global-land-mask) package (MIT licence).
 - Depths, lakes and rivers: [Natural Earth](https://www.naturalearthdata.com/) 10m bathymetry, lakes and river centerlines.
-- Satellite imagery: [NOAA ETOPO1](https://www.ncei.noaa.gov/products/etopo-global-relief-model) ice-surface colour shaded relief.
+- Satellite imagery: [NOAA ETOPO1](https://www.ncei.noaa.gov/products/etopo-global-relief-model) ice-surface colour shaded relief (Amante and Eakins 2009, ETOPO1 1 Arc-Minute Global Relief Model, NOAA Technical Memorandum NESDIS NGDC-24, doi:10.7289/V5C8276M).
 - Land precipitation: [GPCC Precipitation Analysis Climatology V2025](https://opendata.dwd.de/climate_environment/GPCC/html/gpcc_precipitation_analysis_climatology_v2025_doi_download.html), 1°, 1971-2000 (Rustemeier, Finger, Schirmeister, Ziese 2025, doi:10.5676/DWD_GPCC/CLIMAT_V2025_100). Source: Deutscher Wetterdienst, modified. Antarctica, which GPCC does not cover, uses 171 mm/yr (Palerme et al. 2014).
 
 `tools/build_data.py` rebuilds `docs/sim/data/` from these sources. It needs Python with numpy and Pillow:
