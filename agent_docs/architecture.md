@@ -135,6 +135,11 @@ What keeps a step affordable at 0.25° and 0.125°. Behaviour depends on these m
 - Interior ice (fully locked, every neighbour locked or land) relaxes once per tick, on the last substep (`step(h,last)` with `last` = substep count), because the relaxation is linear toward a fixed target.
 - `ewConduct` runs once per tick with the summed coefficient (it is implicit, so stable at any size), skips exactly flat rows, and solves only water runs with a gradient.
 - Airborne seeding draws a Poisson number of launches from `frozenList` instead of a coin per frozen cell.
+- Air transport (`transportAir`) is factorised once per diffusion number `d` (`factorAir`, keyed on `trD`): per row east-west with the Sherman-Morrison correction vector stored, and one north-south factorisation shared by every column. All four fields carried each substep reuse it. The arithmetic matches `solveTridiag`/`solveCyclic` operation for operation, so results are bit-identical; anything that changes the air matrices other than `d` (`airCos`, `airCosEdge`) must reset `trD`.
+- `olrClim[a]`, today's radiation at each air cell's climatology, is recomputed only when `setAirSeason` moves the season or the greenhouse or cloud switches change; `olrBoth` returns the radiation and its slope from one `exp`.
+- `latentK()` and `useDepth()` (and so `CAP()`) read cached values (`latentSet`, `depthSet`) that `readControls` refreshes from the controls' own listeners, registered before every other listener. Never read a DOM control inside a per-cell function.
+- The at-rest test computes `hLat` only for cells whose `advHeat` passes the cheap test first.
+- Check any performance change with `tools/runs/bitwise.mjs`: it hashes every state array after N seeded steps in seven configurations (sinks, floats, depth off, snowfall off, life, mid-run setting changes, 2 h steps); identical hashes before and after mean the paper runs stay valid.
 
 Rough costs in Node (one tick, including a redraw): 0.25° about 37 ms at default speed and 300-550 ms at high speed; 0.125° about 150-200 ms at default speed with about 450 MB resident.
 

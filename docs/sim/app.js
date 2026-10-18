@@ -121,6 +121,7 @@ function setAirSeason(keep) {
       airTclim[a] = c;
     }
   }
+  olrClimOk = false;
 }
 function AREA(i) {return cosLat[(i/W)|0];} // cell area relative to an equatorial cell; stats, totals and gyre shares are area-weighted
 function airIndexOf(i) {
@@ -178,11 +179,51 @@ const airCos = new Float64Array(AH), airCosEdge = new Float64Array(AH+1); // air
 for (let r = 0; r < AH; r++) airCos[r] = Math.cos((89.5-r)*Math.PI/180);
 for (let r = 0; r <= AH; r++) airCosEdge[r] = Math.max(0, Math.cos((90-r)*Math.PI/180));
 function airMixFactor() {return mixSlider.value/4;}
+// The implicit diffusion matrices depend only on the diffusion number d (time step and mixing slider) and the latitude, not on the field,
+// so they are factorised once per d and reused for every field carried and every substep: per row east-west (cyclic, by Sherman-Morrison,
+// with the correction vector z stored), and once for all columns north-south (the same matrix in every column). The arithmetic is that of
+// solveTridiag and solveCyclic, in the same order, so results are bit-identical to solving each system from scratch.
+let trD = NaN;
+const trEwG = new Float64Array(AN), trEwPiv = new Float64Array(AN), trEwZ = new Float64Array(AN), trEwDen = new Float64Array(AH), trEwE = new Float64Array(AH),
+  trNsG = new Float64Array(AH), trNsPiv = new Float64Array(AH), trNsA = new Float64Array(AH), trX = new Float64Array(Math.max(AW, AH));
+function factorAir(d) {
+  trD = d;
+  for (let r = 0; r < AH; r++) { // east-west: a = c = -e, b = 1+2e, wrapping; Sherman-Morrison modifies the first and last diagonal
+    const row0 = r*AW, cosR = airCos[r], e = d/(cosR*cosR), alpha = -e, beta = -e, gamma = -(1+2*e);
+    trEwE[r] = e;
+    let piv = (1+2*e)-gamma;
+    trEwPiv[row0] = piv;
+    let z = gamma/piv;
+    trEwZ[row0] = z;
+    for (let k = 1; k < AW; k++) {
+      const g = -e/piv;
+      trEwG[row0+k] = g;
+      piv = (k === AW-1 ? (1+2*e)-alpha*beta/gamma : 1+2*e)-(-e)*g;
+      trEwPiv[row0+k] = piv;
+      z = ((k === AW-1 ? alpha : 0)-(-e)*z)/piv;
+      trEwZ[row0+k] = z;
+    }
+    for (let k = AW-2; k >= 0; k--) trEwZ[row0+k] -= trEwG[row0+k+1]*trEwZ[row0+k+1];
+    trEwDen[r] = 1+trEwZ[row0]+beta*trEwZ[row0+AW-1]/gamma;
+  }
+  for (let r = 0; r < AH; r++) { // north-south, no flux through the poles
+    const cN = d*airCosEdge[r]/airCos[r], cS = d*airCosEdge[r+1]/airCos[r];
+    trNsA[r] = -cN;
+    const b = 1+cN+cS;
+    if (r === 0) trNsPiv[0] = b;
+    else {
+      const cPrev = -(d*airCosEdge[r]/airCos[r-1]), g = cPrev/trNsPiv[r-1];
+      trNsG[r] = g;
+      trNsPiv[r] = b-(-cN)*g;
+    }
+  }
+}
 function transportAir(h, field) {
   const f = airMixFactor();
   if (!f) return;
   const d = K_V*f*h*3600/(111.2e3*111.2e3), adv = U_V*f*h*3600/111.2e3; // diffusion number and wind shift, per 1° cell at the equator
-  triAlloc(Math.max(W, AW, AH));
+  if (d !== trD) factorAir(d);
+  const x = trX;
   for (let r = 0; r < AH; r++) {
     const row0 = r*AW, cosR = airCos[r], windRow = wind[(r*RES)|0] || 0;
     const shift = adv*windRow/cosR; // cells moved east this step
@@ -197,26 +238,18 @@ function transportAir(h, field) {
       }
       for (let q = 0; q < AW; q++) field[row0+q] = tracerNext[row0+q];
     }
-    const e = d/(cosR*cosR); // east-west
-    for (let q = 0; q < AW; q++) {
-      triA[q] = -e;
-      triC[q] = -e;
-      triB[q] = 1+2*e;
-      triD[q] = field[row0+q];
-    }
-    solveCyclic(AW);
-    for (let q = 0; q < AW; q++) field[row0+q] = triX[q];
+    const ae = -trEwE[r], beta = ae, gamma = -(1+2*trEwE[r]); // east-west, cyclic
+    x[0] = field[row0]/trEwPiv[row0];
+    for (let k = 1; k < AW; k++) x[k] = (field[row0+k]-ae*x[k-1])/trEwPiv[row0+k];
+    for (let k = AW-2; k >= 0; k--) x[k] -= trEwG[row0+k+1]*x[k+1];
+    const fact = (x[0]+beta*x[AW-1]/gamma)/trEwDen[r];
+    for (let q = 0; q < AW; q++) field[row0+q] = x[q]-fact*trEwZ[row0+q];
   }
-  for (let q = 0; q < AW; q++) { // north-south, no flux through the poles
-    for (let r = 0; r < AH; r++) {
-      const cN = d*airCosEdge[r]/airCos[r], cS = d*airCosEdge[r+1]/airCos[r];
-      triA[r] = -cN;
-      triC[r] = -cS;
-      triB[r] = 1+cN+cS;
-      triD[r] = field[r*AW+q];
-    }
-    solveTridiag(AH, triD, triX);
-    for (let r = 0; r < AH; r++) field[r*AW+q] = triX[r];
+  for (let q = 0; q < AW; q++) { // north-south
+    x[0] = field[q]/trNsPiv[0];
+    for (let r = 1; r < AH; r++) x[r] = (field[r*AW+q]-trNsA[r]*x[r-1])/trNsPiv[r];
+    for (let r = AH-2; r >= 0; r--) x[r] -= trNsG[r+1]*x[r+1];
+    for (let r = 0; r < AH; r++) field[r*AW+q] = x[r];
   }
 }
 function expNeg(k) {return k < 0.7 ? 1/(1+k+k*k*0.5+k*k*k*0.1667) : Math.exp(-k);} // cheap exp(-k) for the small per-step rates (accurate to ~1e-3 below 0.7)
@@ -231,6 +264,12 @@ function airStep(h) {
   transportAir(h, vapour); // vapour travels with the same air; vapourToday is at steady state from spinVapourToday
   transportAir(h, latentAir);
   if (snowCk.checked) transportAir(h, crystals);
+  if (!olrClimOk || olrClimGh !== gh || olrClimCl !== cl) {
+    for (let a = 0; a < AN; a++) olrClim[a] = olr(airTclim[a], gh, cl);
+    olrClimOk = true;
+    olrClimGh = gh;
+    olrClimCl = cl;
+  }
   let sum = 0, capped = 0, wAll = 0;
   for (let r = 0; r < AH; r++) {
     const row0 = r*AW, cosR = cosLat[(r*RES)|0], capRow = rowSea[r]+CONV_DT, wAir = AIR_C*cellsPerAir*cosR; // a warming cap, added to each cell's climatology
@@ -239,7 +278,8 @@ function airStep(h) {
       const a = row0+q, tc = airTclim[a];
       let t = tc+airTnext[a];
       // net radiation above today's balance at this cell, stepped backward-Euler on the local slope (stable at any step length)
-      const flux = coolK*(olr(t, gh, cl)-olr(tc, gh, cl)+forcing), slope = Math.max(0.05, coolK*olrSlope(t, gh, cl));
+      olrBoth(t, gh, cl);
+      const flux = coolK*(olrOut-olrClim[a]+forcing), slope = Math.max(0.05, coolK*olrSlopeOut);
       const tIn = t;
       t -= flux*secs/(C_AIR+slope*secs);
       budget.air += (tIn-t)*wAir;
@@ -306,9 +346,9 @@ function solveCyclic(n) { // the same with wrap terms a[0] (to x[n-1]) and c[n-1
 // was tried and rejected: the model's velocity field is not divergence-free on the grid (asymmetric gyre scalings, coasts), so the advective form destroyed more heat than the
 // surface shed over years, and the flux form piled heat into convergence cells. Along-flow mixing keeps what matters here, heat smeared along the currents, without inventing any.
 let advHeat = new Float32Array(0);
-function exchange(i, dst, coef) {
+function exchange(i, dst, coef, areaI, areaDst) { // areaI, areaDst: AREA(i), AREA(dst), passed in by advect
   if (grid[dst] === 1 || kind[dst] === 3) return;
-  const wSrc = CAP(i)*AREA(i)*(1-0.5*phi[i]), wDst = CAP(dst)*AREA(dst)*(1-0.5*phi[dst]), dT = coef*(T[dst]-T[i])*wSrc*wDst/(wSrc+wDst); // heat capacities: solid holds half
+  const wSrc = CAP(i)*areaI*(1-0.5*phi[i]), wDst = CAP(dst)*areaDst*(1-0.5*phi[dst]), dT = coef*(T[dst]-T[i])*wSrc*wDst/(wSrc+wDst); // heat capacities: solid holds half
   advHeat[i] += dT/wSrc;
   advHeat[dst] -= dT/wDst;
 } // moves heat dT*... so both sides change in proportion to their capacities
@@ -317,7 +357,7 @@ function advect(Awind, curRate) {
   if (advHeat.length !== N) advHeat = new Float32Array(N);
   else advHeat.fill(0);
   for (let r = 0; r < H; r++) {
-    const row0 = r*W, cosR = Math.max(1e-3, cosLat[r]), windRow = wind[r], windRate = Awind && Math.abs(windRow) > 0.02 ? Math.min(0.2, Awind*Math.abs(windRow)/cosR) : 0;
+    const row0 = r*W, areaR = cosLat[r], cosR = Math.max(1e-3, cosLat[r]), windRow = wind[r], windRate = Awind && Math.abs(windRow) > 0.02 ? Math.min(0.2, Awind*Math.abs(windRow)/cosR) : 0;
     for (let q = 0; q < W; q++) {
       const i = row0+q;
       if (grid[i] === 1 || kind[i] === 3) continue;
@@ -327,19 +367,19 @@ function advect(Awind, curRate) {
       if (windRate) {
         const dst = windRow > 0 ? east : west;
         const openBoth = Math.min(openHere, openSurface(dst));
-        if (openBoth > 0) exchange(i, dst, windRate*openBoth);
+        if (openBoth > 0) exchange(i, dst, windRate*openBoth, areaR, areaR);
       } // wind drift needs open water on both sides of the exchange
       if (curRate) {
         const u = curU[i], v = curV[i], flowF = flowFactor(i);
         if (Math.abs(u) > 0.05) {
           const dst = u > 0 ? east : west;
-          exchange(i, dst, Math.min(0.2, curRate*Math.abs(u)*flowF*Math.min(1, openSurface(dst)/openHere)/cosR));
+          exchange(i, dst, Math.min(0.2, curRate*Math.abs(u)*flowF*Math.min(1, openSurface(dst)/openHere)/cosR), areaR, areaR);
         }
         if (Math.abs(v) > 0.05) {
           const rowTo = r+(v > 0 ? -1 : 1);
           if (rowTo >= 0 && rowTo < H) {
             const dst = rowTo*W+q;
-            exchange(i, dst, Math.min(0.2, curRate*Math.abs(v)*flowF*Math.min(1, openSurface(dst)/openHere)));
+            exchange(i, dst, Math.min(0.2, curRate*Math.abs(v)*flowF*Math.min(1, openSurface(dst)/openHere)), areaR, cosLat[rowTo]);
           }
         }
       }
@@ -662,7 +702,15 @@ const GROW = 0.5; // fraction of a column that can lock per hour once seeded
 // KV_L and KV_I are eddy diffusion through liquid (1e-4 m²/s) and conduction through the crust (1.2e-6 m²/s) across ~300 m, in column-capacity units per hour per kelvin. Both are deliberately tiny.
 const OVERTURN_W = 0.02; // m/s: open-ocean convective plumes descend at a few cm/s (Marshall & Schott 1999: up to about 10 cm/s)
 const HM = 100, KV_L = 1e-4/300*3600/3700, KV_I = 1.2e-6/300*3600/3700;
-function useDepth() {return floatMode || depthOn.checked;} // the two-layer column needs real capacities
+// the latent-heat and depth controls, cached when they change: latentK() and CAP() are called per cell in the hot loops, and a DOM read there is slow
+let latentSet = 0, depthSet = false;
+function readControls() {
+  latentSet = thermo.checked ? +latentSlider.value : 0;
+  depthSet = depthOn.checked;
+}
+readControls();
+for (const [el, ev] of [[thermo, 'change'], [latentSlider, 'input'], [latentSlider, 'change'], [depthOn, 'change']]) el.addEventListener(ev, readControls); // registered before the other listeners, which read the cache
+function useDepth() {return floatMode || depthSet;} // the two-layer column needs real capacities
 // ===== derived constants (see agent_docs/physics.md for each derivation) =====
 const SALT = 2.2, SALT_SAT = 16; // seawater melting-point depression at 45.8 °C (cryoscopic constant 2.17 K kg/mol); brine concentrates as 1/(1-phi) and saturates at about 7x seawater
 const S0 = 35; // seawater salinity, g/kg. The solid excludes salt, so a layer's liquid has salinity s/(1-p) for bulk salinity s
@@ -818,6 +866,15 @@ const AIR_C = C_AIR/(4.18e6*3700); // the same as a share of the reference ocean
 // saturated atmosphere approaches its limit (the runaway threshold). Without the greenhouse the slope is the Planck response alone.
 // Clouds add the net cloud feedback LAMBDA_C (AR6 central estimate) to the slope.
 const LAMBDA_P = 3.3, LAMBDA_WV = 1.3, TAU_WV = 31, LAMBDA_C = 0.42;
+let olrOut = 0, olrSlopeOut = 0; // olrBoth(): the radiation and its slope from one exp
+function olrBoth(tC, gh, cl) {
+  const T = tC+273.15, ex = gh ? Math.exp((T-288)/TAU_WV) : 0;
+  olrOut = LAMBDA_P*72*(T/288)**4-(gh ? LAMBDA_WV*TAU_WV*ex : 0)-(cl ? LAMBDA_C*(T-288) : 0);
+  olrSlopeOut = LAMBDA_P*(T/288)**3-(gh ? LAMBDA_WV*ex : 0)-(cl ? LAMBDA_C : 0);
+}
+// today's radiation at each air cell's climatology: recomputed only when the season moves (setAirSeason) or the greenhouse or clouds are switched
+const olrClim = new Float64Array(AN);
+let olrClimOk = false, olrClimGh = false, olrClimCl = false;
 function olr(tC, gh, cl) {
   const T = tC+273.15;
   return LAMBDA_P*72*(T/288)**4-(gh ? LAMBDA_WV*TAU_WV*Math.exp((T-288)/TAU_WV) : 0)-(cl ? LAMBDA_C*(T-288) : 0); // 72 = 288/4: the integral of the Planck slope
@@ -1116,7 +1173,7 @@ function reset() {
   draw();
   stats();
 }
-function latentK() {return thermo.checked ? +latentSlider.value : 0;}
+function latentK() {return latentSet;}
 function latentPerPhi(i) {
   return latentK()*(1-2*seaIceCover[i]/Math.max(2, floatMode ? Math.min(depth[i], HM) : depth[i]));
 } // latent heat released per unit solid fraction, less the share that was ordinary sea ice already
@@ -1468,8 +1525,12 @@ function step(h, last) { // last: the substep count on the tick's final substep,
         let quiet = 1, all = 1;
         for (let q = c*CHUNK; q < q1; q++) {
           const i = o+q;
-          const ht = kind[i] === 3 ? H_SENS : H_SENS+hLat(T[i])*openSurface(i), cp = ht/(ht+H_LW);
-          if (Math.abs(advHeat[i]) < 1e-5 && Math.abs(T[i]-seaRef(i)-(atmoOn ? cp*(airT[airCell[i]]-airTclim[airCell[i]]) : 0)) < 0.3) {
+          let rest = Math.abs(advHeat[i]) < 1e-5;
+          if (rest) { // the exp in hLat only for cells that pass the cheap test
+            const ht = kind[i] === 3 ? H_SENS : H_SENS+hLat(T[i])*openSurface(i), cp = ht/(ht+H_LW);
+            rest = Math.abs(T[i]-seaRef(i)-(atmoOn ? cp*(airT[airCell[i]]-airTclim[airCell[i]]) : 0)) < 0.3;
+          }
+          if (rest) {
             atRest[i] = 1;
             if (quiet && grid[i] !== 1) {
               const p = phi[i];

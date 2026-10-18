@@ -24,6 +24,7 @@ pdfLaTeX. `work/` is not committed.
 | `ebhost.mjs`     | energy budget residual (`ebudget.mjs`)                                              |
 | `mbhost.mjs`     | salt change and water held as snow (`mbudget.mjs`)                                  |
 | `siterender.mjs` | website stills and animation frames                                                 |
+| `bitwise.mjs`    | SHA-256 of every state array after N seeded steps: compare before and after changes |
 
 The tables in `work/` are pasted into `paper/ice9.tex` by hand, and the numbers in the paper text and on the website
 are read from them and from `work/maps/*.txt`. The convergence runs set `SEED`; the scenario runs do not, so a rerun with
