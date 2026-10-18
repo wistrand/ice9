@@ -1,0 +1,6 @@
+*.aux
+*.log
+*.out
+build.log
+# the website serves its copy from docs/paper/
+ice9.pdf

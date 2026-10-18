@@ -1,0 +1,24 @@
+== frame 30, 0.16 yr   depth band: cells, mean solid fraction, mean T, share fully locked, share unseeded
+      0-100   m:     630  phi 0.418  T 41.7 C  locked 0.8%  unseeded 0.0%
+    100-200   m:    6805  phi 0.411  T 42.0 C  locked 0.0%  unseeded 0.0%
+    200-500   m:    2204  phi 0.407  T 42.1 C  locked 0.0%  unseeded 0.0%
+    500-1500  m:    6478  phi 0.407  T 42.1 C  locked 0.0%  unseeded 0.0%
+   1500-3000  m:   14386  phi 0.398  T 42.1 C  locked 0.0%  unseeded 0.0%
+   3000-4500  m:   38365  phi 0.395  T 42.2 C  locked 0.0%  unseeded 0.0%
+   4500-20000 m:   48579  phi 0.393  T 42.2 C  locked 0.0%  unseeded 0.0%
+== frame 600, 3.28 yr   depth band: cells, mean solid fraction, mean T, share fully locked, share unseeded
+      0-100   m:     630  phi 0.598  T 38.6 C  locked 5.0%  unseeded 0.0%
+    100-200   m:    6805  phi 0.583  T 39.2 C  locked 2.3%  unseeded 0.0%
+    200-500   m:    2204  phi 0.505  T 41.0 C  locked 0.0%  unseeded 0.0%
+    500-1500  m:    6478  phi 0.476  T 41.4 C  locked 0.0%  unseeded 0.0%
+   1500-3000  m:   14386  phi 0.416  T 42.0 C  locked 0.0%  unseeded 0.0%
+   3000-4500  m:   38365  phi 0.406  T 42.1 C  locked 0.0%  unseeded 0.0%
+   4500-20000 m:   48579  phi 0.400  T 42.1 C  locked 0.0%  unseeded 0.0%
+== frame 1500, 8.20 yr   depth band: cells, mean solid fraction, mean T, share fully locked, share unseeded
+      0-100   m:     630  phi 0.697  T 35.0 C  locked 14.0%  unseeded 0.0%
+    100-200   m:    6805  phi 0.687  T 35.7 C  locked 12.0%  unseeded 0.0%
+    200-500   m:    2204  phi 0.587  T 39.1 C  locked 1.5%  unseeded 0.0%
+    500-1500  m:    6478  phi 0.557  T 39.8 C  locked 0.4%  unseeded 0.0%
+   1500-3000  m:   14386  phi 0.455  T 41.7 C  locked 0.0%  unseeded 0.0%
+   3000-4500  m:   38365  phi 0.427  T 41.9 C  locked 0.0%  unseeded 0.0%
+   4500-20000 m:   48579  phi 0.416  T 42.0 C  locked 0.0%  unseeded 0.0%

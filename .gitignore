@@ -1,0 +1,17 @@
+# downloads made by tools/build_data.py
+tools/cache/
+
+# Python bytecode (paper/fig, tools)
+__pycache__/
+*.pyc
+
+# local Claude Code logs
+.claude/*.log
+
+# OS and editor files
+.DS_Store
+*~
+*.swp
+
+# paper run outputs (tools/runs/jobs.sh)
+tools/runs/work/

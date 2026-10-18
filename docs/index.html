@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ice-Nine and the World Ocean</title>
+<meta name="description" content="A global model of Vonnegut's ice-nine: how much of the ocean freezes, how fast, and what happens to the air and the land.">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#">Ice-nine</a>
+    <nav>
+      <a href="#first-month">First month</a>
+      <a href="#timeline">Timeline</a>
+      <a href="#findings">Findings</a>
+      <a href="#pictures">Pictures</a>
+      <a href="#model">The model</a>
+      <a href="#paper">Paper</a>
+    </nav>
+    <a class="btn primary" href="sim/">Run the simulation</a>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <div>
+      <h1>Ice-nine and the world ocean</h1>
+      <p class="lead">In Kurt Vonnegut's <em>Cat's Cradle</em>, a crystal of ice-nine, a form of ice that melts at 45.8&nbsp;°C, falls into the sea and the oceans freeze. This project models what would actually happen: how much of the ocean freezes, how fast, what stops it, and what happens to the air and the land.</p>
+      <div class="actions">
+        <a class="btn primary" href="sim/">Run the simulation</a>
+        <a class="btn" href="paper/ice9.pdf">Read the paper (PDF)</a>
+      </div>
+    </div>
+    <div class="globes">
+      <figure><img src="img/anim_sinks_globe.webp" alt="Animation: ice-nine spreading from the Caribbean over the first 15 days, sinking case" width="450" height="450"><figcaption>Sinking ice-nine, the first 15 days</figcaption></figure>
+      <figure><img src="img/anim_floats_globe.webp" alt="Animation: ice-nine spreading from the Caribbean over the first 15 days, floating case" width="450" height="450"><figcaption>Floating ice-nine, the first 15 days</figcaption></figure>
+    </div>
+  </div>
+</div>
+
+<section id="timeline">
+  <div class="wrap">
+    <h2>What happens, and when</h2>
+    <p class="intro">The novel does not say whether ice-nine is denser than water, and that decides the outcome. If the solid sinks, the ocean becomes a hot slush with open water on top. If it floats, a crust closes over the sea. Both runs start from a single seed in the Caribbean in October, on a 0.5° grid.</p>
+    <div class="lanes">
+      <div class="lane">
+        <h3>If ice-nine sinks</h3>
+        <p class="sub">The ocean becomes slush from top to bottom and stays open at the surface.</p>
+        <ol>
+          <li><div class="when">day 3</div><div class="what">Rain seeds the sea</div><div class="detail">Crystals lofted by sea spray freeze the rain they meet, and that rain seeds open water wherever it falls: 10% of the ocean frozen.</div></li>
+          <li><div class="when">day 7</div><div class="what">The freeze stalls</div><div class="detail">39% of the ocean by mass. Each column has heated itself to its melting point with its own latent heat.</div></li>
+          <li><div class="when">day 10</div><div class="what">The land is white</div><div class="detail">93% of the land under ice-nine snow, which melts only above 45.8&nbsp;°C. Rain over land is six times today's.</div></li>
+          <li><div class="when">day 16</div><div class="what">The air peaks</div><div class="detail">43&nbsp;°C, from 14&nbsp;°C at the start; it settles near 36&nbsp;°C within a month.</div></li>
+          <li><div class="when">first summer</div><div class="what">Snow melts back on hot continents</div><div class="detail">Cover falls to about 90% and returns in autumn.</div></li>
+          <li><div class="when">year 1 to 12</div><div class="what">Slow freezing, paced by radiation to space</div><div class="detail">About 0.4 percentage points a year: 44% frozen after twelve years. The slush ocean stays near 42&nbsp;°C and the air near 35&nbsp;°C.</div></li>
+        </ol>
+      </div>
+      <div class="lane float">
+        <h3>If ice-nine floats</h3>
+        <p class="sub">A crust forms on the sea; brine from it overturns the water below.</p>
+        <ol>
+          <li><div class="when">day 7</div><div class="what">A crust starts to form</div><div class="detail">26% of the surface covered within a week; the land is white by day 15.</div></li>
+          <li><div class="when">year 1</div><div class="what">The deep ocean overturns</div><div class="detail">Salt rejected by the crust makes the water under it denser than the deep water. The column overturns and the deep water freezes against the crystals: 28 to 31% of the ocean frozen.</div></li>
+          <li><div class="when">year 3</div><div class="what">The deep freeze stops</div><div class="detail">42.5% of the ocean frozen, close to its limit of 43.7%.</div></li>
+          <li><div class="when">year 4.7</div><div class="what">Colder than today</div><div class="detail">The white crust and the white land reflect sunlight; the air falls below its starting 14&nbsp;°C.</div></li>
+          <li><div class="when">year 5.8</div><div class="what">The crust closes</div><div class="detail">Rain stops, because the ocean no longer evaporates.</div></li>
+          <li><div class="when">year 12</div><div class="what">A snowball</div><div class="detail">The air is at &minus;37&nbsp;°C and still cooling.</div></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="findings">
+  <div class="wrap">
+    <h2>Main findings</h2>
+    <p class="intro">From 25 scenarios run for twelve simulated years, each changing one assumption, plus convergence tests and an energy budget that closes to 0.03%.</p>
+    <div class="cards">
+      <div class="card"><div class="big">39%</div><h3>The ocean stalls at about two fifths</h3><p>Freezing releases latent heat into the water itself. A column freezes until it reaches its melting point, then only as fast as heat leaves the planet. The stall level is set by the latent heat and does not depend on grid, time step or front speed. Rain seeding gets it there within a week.</p></div>
+      <div class="card"><div class="big">0.4 pt/yr</div><h3>Then it is radiation that sets the pace</h3><p>After the first weeks the freeze advances only as fast as the atmosphere sheds heat to space. At that rate the rest of the ocean would take more than a century.</p></div>
+      <div class="card"><div class="big">93%</div><h3>Ice-nine snow covers the land within two weeks</h3><p>Sea spray carries crystals into the air, and rain that forms around them falls as ice-nine. Fresh ice-nine melts 2.2&nbsp;K above the brine-depressed sea slush, so it survives in a very hot world. How far it reaches is uncertain: across 54 combinations of crystal and rain assumptions, land cover after a year ranged from 16% to 94%.</p></div>
+      <div class="card"><div class="big">sinks or floats</div><h3>The density of ice-nine decides the ending</h3><p>A sinking solid leaves an open slush ocean near 42&nbsp;°C for decades. A floating solid closes a crust in about six years and the planet becomes a snowball.</p></div>
+      <div class="card"><div class="big">39 K vs 17 K</div><h3>The poles warm most</h3><p>Polar water starts near &minus;1&nbsp;°C and is lifted to the melting point by its own latent heat; tropical water starts near 27&nbsp;°C. The air follows the sea.</p></div>
+      <div class="card"><div class="big">years, not minutes</div><h3>Only the floating case resembles the novel</h3><p>And it takes years. Known high-pressure ice phases are denser than water, which favours the sinking case.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="first-month">
+  <div class="wrap">
+    <h2>The first month</h2>
+    <p class="intro">One seed in the Caribbean. The lattice spreads by contact at about 15&nbsp;km/h, rides the currents, and is carried by the wind: sea spray lofts crystals, and rain that forms around them seeds the sea, the lakes and the rivers it falls on, and whitens the land. Within a week almost the whole ocean is seeded and the freeze stalls, held back by its own heat; by day 10 the land is white. One frame per day, from runs with 2-hour steps.</p>
+    <div class="pair">
+      <figure><img src="img/anim_sinks_flat.webp" alt="Animated map of the first 15 days, sinking case" width="720" height="360"><figcaption>Sinking ice-nine: the sea turns to slush at its melting point (amber); land turns white.</figcaption></figure>
+      <figure><img src="img/anim_floats_flat.webp" alt="Animated map of the first 15 days, floating case" width="720" height="360"><figcaption>Floating ice-nine: a crust (blue-white) grows over the warming mixed layer.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="pictures">
+  <div class="wrap">
+    <h2>The world in pictures</h2>
+    <p class="intro">Renders from the model, flat and on the globe over the natural-colour relief. Water is coloured by temperature: navy cold, amber near the melting point, red above it. Blue-white is ice-nine, at sea or as snow on land.</p>
+    <div class="stages" role="group" aria-label="Stage">
+      <button type="button" data-stage="d5">Day 5</button>
+      <button type="button" data-stage="d10">Day 10</button>
+      <button type="button" data-stage="d15">Day 15</button>
+      <button type="button" data-stage="d24">Day 24</button>
+      <button type="button" data-stage="d80" aria-pressed="true">Day 80</button>
+      <button type="button" data-stage="y1">Year 1</button>
+      <button type="button" data-stage="y8">Year 8</button>
+    </div>
+    <div class="pair">
+      <figure>
+        <img class="flat" data-case="sinks" src="img/sinks_d80_flat.webp" alt="Flat map, sinking ice-nine" width="720" height="360">
+        <div class="globe-row">
+          <img data-case="sinks" data-view="atlantic" src="img/sinks_d80_globe_atlantic.webp" alt="Globe, Atlantic" width="300" height="300">
+          <img data-case="sinks" data-view="pacific" src="img/sinks_d80_globe_pacific.webp" alt="Globe, Pacific" width="300" height="300">
+          <img data-case="sinks" data-view="arctic" src="img/sinks_d80_globe_arctic.webp" alt="Globe, Arctic" width="300" height="300">
+        </div>
+        <figcaption>Sinking ice-nine</figcaption>
+      </figure>
+      <figure>
+        <img class="flat" data-case="floats" src="img/floats_d80_flat.webp" alt="Flat map, floating ice-nine" width="720" height="360">
+        <div class="globe-row">
+          <img data-case="floats" data-view="atlantic" src="img/floats_d80_globe_atlantic.webp" alt="Globe, Atlantic" width="300" height="300">
+          <img data-case="floats" data-view="pacific" src="img/floats_d80_globe_pacific.webp" alt="Globe, Pacific" width="300" height="300">
+          <img data-case="floats" data-view="arctic" src="img/floats_d80_globe_arctic.webp" alt="Globe, Arctic" width="300" height="300">
+        </div>
+        <figcaption>Floating ice-nine</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="model">
+  <div class="wrap">
+    <h2>How the model works</h2>
+    <p class="intro">A global grid of ocean columns with a one-degree atmosphere above it, run in the browser. Every physical constant has a written derivation; the few that are estimates are marked as such.</p>
+    <div class="cols">
+      <div>
+        <h3>The ocean</h3>
+        <p>Each column has a temperature and a solid fraction. A seeded column freezes while it is below its melting point. Freezing releases latent heat into the column (389&nbsp;kJ/kg, from the entropy of fusion of known ices), and the melting point falls as the remaining brine gets saltier. A sinking solid turns the whole column to slush; a floating one forms a crust over a 100&nbsp;m mixed layer, and brine from the crust overturns the water below.</p>
+        <h3>The front</h3>
+        <p>A seeded column seeds its neighbours at about 15&nbsp;km/h. Currents carry crystals downstream, and rain falling through crystal-laden air seeds the sea, lakes and rivers it lands on.</p>
+      </div>
+      <div>
+        <h3>The air</h3>
+        <p>The sea exchanges heat with the air by standard bulk formulas. The air has today's seasonal climate, moves at realistic wind and mixing speeds, and radiates to space with a water-vapour greenhouse and clouds. White surfaces (crust, frozen columns, snow) reflect sunlight in proportion to the sunshine they receive. Moist convection keeps the air within a few degrees of the sea.</p>
+        <h3>Water and snow</h3>
+        <p>Evaporation feeds a vapour field that rains out over about nine days, on top of today's rainfall map. The latent heat travels with the vapour. Rain that forms around ice-nine crystals lands as snow, which melts only where the air or sunlit ground passes 45.8&nbsp;°C.</p>
+      </div>
+    </div>
+    <h3 style="margin-top:28px">How sure is each result?</h3>
+    <div class="tablewrap">
+      <table>
+        <tr><th>Result</th><th>Confidence</th><th>Why</th></tr>
+        <tr><td>The ocean stalls near 39% within a week or two</td><td class="conf">high</td><td>The level follows from energy conservation and is identical across grids, time steps and seeds. The timing depends on the time step: day 7 at 2 h steps, day 20 at 48 h.</td></tr>
+        <tr><td>Slow freezing afterwards, decades to centuries to finish</td><td class="conf">moderate</td><td>Rate set by radiation to space; the atmosphere is a single layer with prescribed feedbacks.</td></tr>
+        <tr><td>Deposited ice-nine snow survives in a very hot world</td><td class="conf">moderate to high</td><td>Fresh ice-nine melts above the brine-depressed slush that sets the air temperature.</td></tr>
+        <tr><td>Nearly all land white within weeks</td><td class="conf">low to moderate</td><td>Depends on how long crystals stay in the air and on where the extra rain falls; deserts and continental interiors are the least certain.</td></tr>
+        <tr><td>A floating crust ends in a snowball</td><td class="conf">moderate</td><td>Robust in direction; the timing shifts by about a year with grid and time step, and the end temperature depends on clouds and snow.</td></tr>
+      </table>
+    </div>
+    <h3 style="margin-top:28px">Not modelled</h3>
+    <p style="font-size:15px">Ocean circulation below the surface, cloud reflection in a much wetter world, changes in the global circulation of the atmosphere, salt precipitation, and the loss of ocean water to snow on land. The front speed, the seeding rates and the crystal lifetime in the air are estimates; the crystal lifetime has the largest effect on how much land whitens.</p>
+  </div>
+</section>
+
+<section id="paper">
+  <div class="wrap">
+    <h2>The paper</h2>
+    <p class="intro">All scenarios, the convergence tests, the energy budget and the sensitivity of the snow results are in the paper.</p>
+    <div class="paper">
+      <div class="paper-actions">
+        <a class="btn primary" href="paper/ice9.pdf">Freezing of the world ocean by ice-nine (PDF)</a>
+        <a class="btn" href="sim/">Run the simulation</a>
+      </div>
+      <p style="font-size:15px;color:var(--muted);max-width:46em">The model runs in any modern browser with no installation: open the simulation, tap the sea to drop a seed, and press Start. The controls let you change every assumption discussed here, from whether ice-nine floats to how long crystals stay in the air.</p>
+      <figure><img src="paper/timeline.png" alt="Timeline of the two scenarios: ocean frozen and air temperature against time" width="1650" height="1454" loading="lazy"><figcaption>Timeline of both scenarios, from the paper.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Data: NOAA GLOBE land mask, Natural Earth bathymetry, lakes and rivers, NOAA ETOPO1 relief, GPCC precipitation climatology (Deutscher Wetterdienst, CC BY 4.0; Rustemeier et al. 2025, doi:10.5676/DWD_GPCC/CLIMAT_V2025_100). Physical constants and their sources are documented with the code. Ice-nine is from Kurt Vonnegut, <em>Cat's Cradle</em> (1963).</p>
+  </div>
+</footer>
+
+<script>
+// switch the gallery between stages; images are named img/{case}_{stage}_{flat|globe_view}.webp
+(() => {
+  const buttons = document.querySelectorAll('.stages button');
+  function show(stage) {
+    for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.stage === stage));
+    for (const img of document.querySelectorAll('#pictures img[data-case]')) {
+      const c = img.dataset.case;
+      const early = ['d5', 'd10', 'd15'].includes(stage); // early stages have only the Atlantic view
+      if (!img.classList.contains('flat') && early && img.dataset.view !== 'atlantic') { img.hidden = true; continue; }
+      img.hidden = false;
+      img.src = img.classList.contains('flat') ? `img/${c}_${stage}_flat.webp` : `img/${c}_${stage}_globe_${img.dataset.view}.webp`;
+    }
+  }
+  for (const b of buttons) b.addEventListener('click', () => show(b.dataset.stage));
+})();
+</script>
+</body>
+</html>
