@@ -12,7 +12,7 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 W=${1:-$HERE/work}
 A=$W/app
 cd "$W"
-mkdir -p sweep hourly conv snow maps site
+mkdir -p sweep hourly conv snow maps site site_nat
 J=$W/jobs.txt
 : > "$J"
 air() { echo "env $1 node $HERE/airstudy.mjs ${2:-$A} 2200 2 100 ${3:-1} $W/sweep/$4.json > /dev/null" >> "$J"; }
@@ -71,10 +71,13 @@ echo "node $HERE/diaghost.mjs $A 1 x 0 > $W/maps/diag_f.txt" >> "$J"
 echo "env DAYS=365,1095 node $HERE/ebhost.mjs $A 0 x 0 > $W/maps/eb_s.txt" >> "$J"
 echo "env DAYS=365,1095 node $HERE/ebhost.mjs $A 1 x 0 > $W/maps/eb_f.txt" >> "$J"
 echo "node $HERE/mbhost.mjs $A 1 x 0 > $W/maps/mb_f.txt" >> "$J"
-# website: stills at days 24 and 80 and years 1 and 8 (48 h steps), and 15 daily frames for the first weeks (2 h steps)
+# website: stills at days 24 and 80 and years 1 and 8 (48 h steps), and 15 daily frames for the first weeks (2 h steps),
+# in the temperature view (site/) and in natural colour (site_nat/)
 for c in "0 sinks" "1 floats"; do set -- $c
   echo "node $HERE/siterender.mjs $A $1 $W/site/$2 $W/sat.rgba > /dev/null" >> "$J"
   echo "env DAILY=15 VIEWS=atlantic SPEED=49 node $HERE/siterender.mjs $A $1 $W/site/$2 $W/sat.rgba > /dev/null" >> "$J"
+  echo "env NATURAL=1 node $HERE/siterender.mjs $A $1 $W/site_nat/$2 $W/sat.rgba > /dev/null" >> "$J"
+  echo "env NATURAL=1 DAILY=15 VIEWS=atlantic SPEED=49 node $HERE/siterender.mjs $A $1 $W/site_nat/$2 $W/sat.rgba > /dev/null" >> "$J"
 done
 if [ -n "$PART" ]; then
   awk -v k="${PART%/*}" -v n="${PART#*/}" '(NR-1)%n==k' "$J" > "$J.part"

@@ -35,8 +35,9 @@
       </div>
     </div>
     <div class="globes">
-      <figure><img src="img/anim_sinks_globe.webp" alt="Animation: ice-nine spreading from the Caribbean over the first 15 days, sinking case" width="450" height="450"><figcaption>Sinking ice-nine, the first 15 days</figcaption></figure>
-      <figure><img src="img/anim_floats_globe.webp" alt="Animation: ice-nine spreading from the Caribbean over the first 15 days, floating case" width="450" height="450"><figcaption>Floating ice-nine, the first 15 days</figcaption></figure>
+      <figure><img src="img/anim_sinks_globe.webp" alt="Animation: ice-nine spreading from the Caribbean over the first 15 days, sinking case" width="450" height="450"><figcaption>Sinking ice-nine, the first 15 days: the sea turns milky as crystals spread and sink, the land turns white</figcaption></figure>
+      <figure><img src="img/anim_floats_globe.webp" alt="Animation: ice-nine spreading from the Caribbean over the first 15 days, floating case" width="450" height="450"><figcaption>Floating ice-nine, the first 15 days: a white crust spreads over open water</figcaption></figure>
+      <p class="note">Natural colour: roughly what you would see from space. The milky sea of the sinking case is a slush at about 42&nbsp;°C.</p>
     </div>
   </div>
 </div>
@@ -92,7 +93,7 @@
 <section id="first-month">
   <div class="wrap">
     <h2>The first month</h2>
-    <p class="intro">One seed in the Caribbean. The lattice spreads by contact at about 15&nbsp;km/h, rides the currents, and is carried by the wind: sea spray lofts crystals, and rain that forms around them seeds the sea, the lakes and the rivers it falls on, and whitens the land. Within a week almost the whole ocean is seeded and the freeze stalls, held back by its own heat; by day 10 the land is white. One frame per day, from runs with 2-hour steps.</p>
+    <p class="intro">One seed in the Caribbean. The lattice spreads by contact at about 15&nbsp;km/h, rides the currents, and is carried by the wind: sea spray lofts crystals, and rain that forms around them seeds the sea, the lakes and the rivers it falls on, and whitens the land. Within a week almost the whole ocean is seeded and the freeze stalls, held back by its own heat; by day 10 the land is white. One frame per day, from runs with 2-hour steps. These maps show temperature, not colour: amber is slush at its melting point, about 42&nbsp;°C.</p>
     <div class="pair">
       <figure><img src="img/anim_sinks_flat.webp" alt="Animated map of the first 15 days, sinking case" width="720" height="360"><figcaption>Sinking ice-nine: the sea turns to slush at its melting point (amber); land turns white.</figcaption></figure>
       <figure><img src="img/anim_floats_flat.webp" alt="Animated map of the first 15 days, floating case" width="720" height="360"><figcaption>Floating ice-nine: a crust (blue-white) grows over the warming mixed layer.</figcaption></figure>
@@ -103,7 +104,11 @@
 <section id="pictures">
   <div class="wrap">
     <h2>The world in pictures</h2>
-    <p class="intro">Renders from the model, flat and on the globe over the natural-colour relief. Water is coloured by temperature: navy cold, amber near the melting point, red above it. Blue-white is ice-nine, at sea or as snow on land.</p>
+    <p class="intro">Renders from the model, flat and on the globe over the natural-colour relief. Natural colour shows roughly what you would see from above: open water blue whatever its temperature, milky where sinking ice-nine is in the water, the floating crust and land snow white. Temperature shows water navy when cold, amber near the melting point and red above it, with ice-nine blue-white.</p>
+    <div class="stages views" role="group" aria-label="View">
+      <button type="button" data-mode="nat" aria-pressed="true">Natural colour</button>
+      <button type="button" data-mode="temp">Temperature</button>
+    </div>
     <div class="stages" role="group" aria-label="Stage">
       <button type="button" data-stage="d5">Day 5</button>
       <button type="button" data-stage="d10">Day 10</button>
@@ -115,20 +120,20 @@
     </div>
     <div class="pair">
       <figure>
-        <img class="flat" data-case="sinks" src="img/sinks_d80_flat.webp" alt="Flat map, sinking ice-nine" width="720" height="360">
+        <img class="flat" data-case="sinks" src="img/nat_sinks_d80_flat.webp" alt="Flat map, sinking ice-nine" width="720" height="360">
         <div class="globe-row">
-          <img data-case="sinks" data-view="atlantic" src="img/sinks_d80_globe_atlantic.webp" alt="Globe, Atlantic" width="300" height="300">
-          <img data-case="sinks" data-view="pacific" src="img/sinks_d80_globe_pacific.webp" alt="Globe, Pacific" width="300" height="300">
-          <img data-case="sinks" data-view="arctic" src="img/sinks_d80_globe_arctic.webp" alt="Globe, Arctic" width="300" height="300">
+          <img data-case="sinks" data-view="atlantic" src="img/nat_sinks_d80_globe_atlantic.webp" alt="Globe, Atlantic" width="300" height="300">
+          <img data-case="sinks" data-view="pacific" src="img/nat_sinks_d80_globe_pacific.webp" alt="Globe, Pacific" width="300" height="300">
+          <img data-case="sinks" data-view="arctic" src="img/nat_sinks_d80_globe_arctic.webp" alt="Globe, Arctic" width="300" height="300">
         </div>
         <figcaption>Sinking ice-nine</figcaption>
       </figure>
       <figure>
-        <img class="flat" data-case="floats" src="img/floats_d80_flat.webp" alt="Flat map, floating ice-nine" width="720" height="360">
+        <img class="flat" data-case="floats" src="img/nat_floats_d80_flat.webp" alt="Flat map, floating ice-nine" width="720" height="360">
         <div class="globe-row">
-          <img data-case="floats" data-view="atlantic" src="img/floats_d80_globe_atlantic.webp" alt="Globe, Atlantic" width="300" height="300">
-          <img data-case="floats" data-view="pacific" src="img/floats_d80_globe_pacific.webp" alt="Globe, Pacific" width="300" height="300">
-          <img data-case="floats" data-view="arctic" src="img/floats_d80_globe_arctic.webp" alt="Globe, Arctic" width="300" height="300">
+          <img data-case="floats" data-view="atlantic" src="img/nat_floats_d80_globe_atlantic.webp" alt="Globe, Atlantic" width="300" height="300">
+          <img data-case="floats" data-view="pacific" src="img/nat_floats_d80_globe_pacific.webp" alt="Globe, Pacific" width="300" height="300">
+          <img data-case="floats" data-view="arctic" src="img/nat_floats_d80_globe_arctic.webp" alt="Globe, Arctic" width="300" height="300">
         </div>
         <figcaption>Floating ice-nine</figcaption>
       </figure>
@@ -192,20 +197,24 @@
 </footer>
 
 <script>
-// switch the gallery between stages; images are named img/{case}_{stage}_{flat|globe_view}.webp
+// switch the gallery between stages and views; images are named img/{nat_}{case}_{stage}_{flat|globe_view}.webp (nat_: natural colour)
 (() => {
-  const buttons = document.querySelectorAll('.stages button');
-  function show(stage) {
-    for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.stage === stage));
+  const stages = document.querySelectorAll('.stages:not(.views) button'), modes = document.querySelectorAll('.views button');
+  let stage = 'd80', mode = 'nat';
+  function show() {
+    for (const b of stages) b.setAttribute('aria-pressed', String(b.dataset.stage === stage));
+    for (const b of modes) b.setAttribute('aria-pressed', String(b.dataset.mode === mode));
+    const pre = mode === 'nat' ? 'nat_' : '';
     for (const img of document.querySelectorAll('#pictures img[data-case]')) {
       const c = img.dataset.case;
       const early = ['d5', 'd10', 'd15'].includes(stage); // early stages have only the Atlantic view
       if (!img.classList.contains('flat') && early && img.dataset.view !== 'atlantic') { img.hidden = true; continue; }
       img.hidden = false;
-      img.src = img.classList.contains('flat') ? `img/${c}_${stage}_flat.webp` : `img/${c}_${stage}_globe_${img.dataset.view}.webp`;
+      img.src = img.classList.contains('flat') ? `img/${pre}${c}_${stage}_flat.webp` : `img/${pre}${c}_${stage}_globe_${img.dataset.view}.webp`;
     }
   }
-  for (const b of buttons) b.addEventListener('click', () => show(b.dataset.stage));
+  for (const b of stages) b.addEventListener('click', () => { stage = b.dataset.stage; show(); });
+  for (const b of modes) b.addEventListener('click', () => { mode = b.dataset.mode; show(); });
 })();
 </script>
 </body>

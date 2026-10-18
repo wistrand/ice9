@@ -14,7 +14,7 @@
   <a class="home" href="../index.html">&larr; Ice-nine: findings, paper and renders</a>
   <header>
     <h1>Ice-Nine Ocean Spread</h1>
-    <div class="sub">Melting point 45.8 °C · seed crystal lattice · latent heat on</div>
+    <div class="sub">Melting point 45.8 °C</div>
   </header>
 
   <div class="mapbox" id="mapbox">
@@ -28,15 +28,16 @@
     <div class="loading" id="loading">Decoding coastlines and bathymetry…</div>
   </div>
   <div class="legend">
-    <span><i id="lg_temp" class="bar"></i>water temperature, −2 to 44 °C (column mean when ice-nine sinks, mixed layer when it floats); shading shows the sea floor</span>
-    <span><i id="lg_hot"></i>above its melting point (43.6 °C for seawater, lower as brine concentrates): cannot freeze</span>
-    <span><i id="lg_ice9"></i>ice-nine at the surface, and as snow on land</span>
-    <span><i id="lg_algae"></i>algae in the crust's brine (life option)</span>
-    <span><i id="lg_ice"></i>ordinary ice: seasonal sea ice, ice sheets</span>
-    <span><i id="lg_land"></i>land; rivers and lakes look like land until the lattice reaches them</span>
+    <span><i id="lg_temp" class="bar"></i>water temperature, −2 to 44 °C</span>
+    <span><i id="lg_hot"></i>above its melting point: cannot freeze</span>
+    <span><i id="lg_ice9"></i>ice-nine, and snow on land</span>
+    <span><i id="lg_algae"></i>algae in the crust</span>
+    <span><i id="lg_ice"></i>ordinary ice</span>
+    <span><i id="lg_land"></i>land</span>
     <span><i id="lg_night"></i>night side</span>
-    <span><i id="lg_air" class="bar"></i>air temperature overlay, −20 to 50 °C</span>
-    <span><i id="lg_phi" class="bar"></i>solid fraction overlay, whole column: little to fully frozen</span>
+    <span><i id="lg_sea"></i><i id="lg_milk"></i>natural colour: open water, milky with sinking ice-nine</span>
+    <span><i id="lg_air" class="bar"></i>air temperature, −20 to 50 °C</span>
+    <span><i id="lg_phi" class="bar"></i>solid fraction, 0 to 100%</span>
   </div>
   <div class="runbar">
     <div class="btns">
@@ -50,6 +51,7 @@
 
   <section class="controls" aria-labelledby="h_view">
     <h2 class="ctl" id="h_view">Display <small>changes only the map, never the run; Globe and Satellite are on the map</small></h2>
+    <label class="ck"><input type="checkbox" id="natural"> Natural colour</label>
     <label class="ck"><input type="checkbox" id="showcur"> Show currents</label>
     <label class="ck"><input type="checkbox" id="showair"> Show air temperature</label>
     <label class="ck"><input type="checkbox" id="showphi"> Show solid fraction</label>

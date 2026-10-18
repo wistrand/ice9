@@ -46,6 +46,8 @@ img { max-width: 100%; height: auto; display: block; }
 .globes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .globes figure { margin: 0; text-align: center; }
 .globes figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; }
+.globes .note { grid-column: 1 / -1; margin: 0; font-size: 13px; color: var(--muted); text-align: center; }
+.stages.views { margin-bottom: 10px; }
 @media (max-width: 860px) { .hero .wrap { grid-template-columns: 1fr; } }
 
 /* sections */

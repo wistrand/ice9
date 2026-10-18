@@ -50,6 +50,7 @@ There are no tests and no build. `file://` does not work (fetch is blocked).
 - Physical constants are derived, not tuned (`agent_docs/physics.md`). Never change one without a derivation written there.
 - No dependencies. No npm, no bundler, no CDN scripts or stylesheets, no web fonts. The page makes no external requests. Use browser built-ins (for example `DecompressionStream` instead of pako) and system font stacks.
 - `docs/` stays directly servable as static files. Paths in HTML and JS are relative.
+- `docs/CNAME` holds the custom domain `ice9.world` for GitHub Pages; never delete or rename it.
 - The simulation is self-contained in `docs/sim/` (its `data/` included); the website at `docs/` root links to it as `sim/`. Website numbers come from the paper runs; update them when the paper changes.
 - The column is one layer (sinks mode) or, with the floats toggle (`floatMode`), a mixed layer over a deep layer (`Td`, `phid`, `capd`). Everything the front does acts on the mixed layer; only `deepStep` and the vertical-exchange term touch the deep layer, and both keep `frozenMass` in step. `Td` must be set from `T0d` in both `build` and `reset`.
 - Energy is conserved: column enthalpy `(1 - phi/2)*T - phi*(l - MELT/2)` per unit capacity, heat flows weighted by `cap*(1 - phi/2)`, and every flux across the boundary added to `budget`. Never add a heat source or sink without a `budget` entry; re-run the budget check after touching freezing or exchange (see [agent_docs/gotchas.md](agent_docs/gotchas.md)).
@@ -64,8 +65,8 @@ There are no tests and no build. `file://` does not work (fetch is blocked).
 - Code style in `app.js`: one statement per line, two-space indentation, spaces around assignment, comparison and logical operators and after commas; arithmetic stays tight (`i*4+k`). Names are descriptive (`airT`, `condW`, `atRest`, `probLiquid`); the physics notation of [agent_docs/physics.md](agent_docs/physics.md) stays short (`T`, `phi`, `cap`, `ht`, `hx`, `cp`, `k`), and so do loop indices (`i`, `r`, `q`, `a`). The file is split into `// ===== section =====` blocks; add new code to the section it belongs to. Comments explain the physics or the reason, not the syntax. Short one-statement blocks may stay on one line.
 - Never run `deno fmt`, `deno lint`, or any formatter on these files.
 - Keep `app.js` a classic `defer` script, not a module, so the IIFE's closure scope stays as is.
-- The page separates Model settings (change the run) from Display settings (`showcur`, `showair`, `showphi`, globe, satellite; read only in rendering). Never let a display setting change the model state.
-- Map colours are defined once in `app.js` (the OKLab ramps `TLUT`, `PLUT` and the constants `HOT`, `ICE9`, `ICE`, `NIGHT`) and `legend()` paints the swatches in `index.html` from them. Never hard-code a map colour in the HTML.
+- The page separates Model settings (change the run) from Display settings (`natural`, `showcur`, `showair`, `showphi`, globe, satellite; read only in rendering). Never let a display setting change the model state.
+- Map colours are defined once in `app.js` (the OKLab ramps `TLUT`, `PLUT` and the constants `HOT`, `ICE9`, `ICE`, `SEA`, `MILK`, `NIGHT`) and `legend()` paints the swatches in `index.html` from them. Never hard-code a map colour in the HTML.
 
 ## Documentation Style
 

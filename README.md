@@ -2,7 +2,7 @@
 
 A browser simulation of ice-nine, the seed crystal from Kurt Vonnegut's *Cat's Cradle*
 that freezes water at 45.8 °C, spreading through the world's oceans, plus a paper and a
-website with the results.
+website with the results. Live at <https://ice9.world> (simulation at <https://ice9.world/sim/>).
 
 Drop a seed in the water and watch the lattice advance. Freezing releases latent heat
 into the water, so each column stops at its melting point: the ocean stalls near 39%
@@ -44,8 +44,8 @@ GitHub Pages can publish it directly: set the Pages source to the `docs/` folder
   mixing, crystal lofting, washout and threshold, and checkboxes for floating ice-nine,
   latent heat (uncheck for Vonnegut mode, where nothing stops the front), day/night and seasons,
   atmosphere, greenhouse, clouds, life in the brine, bathymetry, currents and snowfall.
-- Display settings only change the picture: currents, air temperature, solid fraction,
-  globe and satellite.
+- Display settings only change the picture: natural colour (roughly what the planet would look
+  like from space), currents, air temperature, solid fraction, globe and satellite.
 
 Requires a browser with `DecompressionStream` (Chrome 80+, Firefox 113+, Safari 16.4+).
 

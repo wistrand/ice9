@@ -638,7 +638,7 @@ let frozen = 0, frozenMass = 0, inlandFrozen = 0, hours = 0, running = false, ho
 // ===== controls and the satellite base image =====
 const playBtn = $('play'), rateSlider = $('rate'), speedSlider = $('speed'), latentSlider = $('lat'), coolSlider = $('cool'), thermo = $('thermo'),
   solar = $('solar'), mixSlider = $('mix'), atmo = $('atmo'), airborne = $('airborne'), depthOn = $('depthOn'),
-  resSel = $('res'), currents = $('currents'), showcur = $('showcur'), showair = $('showair'), showphi = $('showphi'),
+  resSel = $('res'), currents = $('currents'), showcur = $('showcur'), showair = $('showair'), showphi = $('showphi'), naturalCk = $('natural'),
   solidSlider = $('solid'), globeCk = $('globe'), satelliteCk = $('satellite'), floatsCk = $('floats'), snowCk = $('snowfall'), greenhouseCk = $('greenhouse'), cloudsCk = $('clouds'), lifeCk = $('life'), washSlider = $('wash'), loftSlider = $('loft'),
   threshSlider = $('thresh');
 // natural-colour relief base (NOAA ETOPO1), loaded once; drawn beneath the simulation in satellite mode
@@ -722,6 +722,14 @@ const HOT = oklabToRgb(...oklch(0.56, 0.2, 27)); // above the melting point: out
 const ICE9 = oklabToRgb(...oklch(0.94, 0.045, 225)); // ice-nine: blue-white, as the novel describes it
 const ICE = oklabToRgb(...oklch(0.86, 0.008, 250)); // ordinary ice: neutral
 const ALGAE = oklabToRgb(...oklch(0.62, 0.11, 35)); // a bloom in the crust's brine: the reddish-brown of carotenoid-rich algae and halophilic mats
+// natural colour (display option): the sea as seen from above, whatever its temperature. Display only, drawn for legibility, not the
+// albedo the model uses: seeded sinking water takes a milky turquoise tint from crystals in suspension (inference, as for glacial silt),
+// never white; floating ice gathers at the top, so the crust shows brighter than its solid fraction (square root of phi/NAT_FULL)
+const SEA = oklabToRgb(...oklch(0.40, 0.085, 242));
+const MILK = oklabToRgb(...oklch(0.66, 0.09, 195));
+const NAT_FULL = 0.4; // solid fraction at which the tint, or the floating crust, reaches full strength
+const MILK_MAX = 0.75; // the strongest milky tint, so a slush sea never reads as white ice
+const CRUST_MAX = 0.88; // the floating crust stops short of snow white, so coastlines stay readable
 const PLUT = rampLUT([[0, oklch(0.34, 0.11, 310)], [1, oklch(0.95, 0.03, 310)]], 0, 1, 101); // solid-fraction overlay: purple, off the water hues
 const NIGHT = [0.62, 0.66, 0.78];
 function css(c) {return 'rgb('+c[0]+','+c[1]+','+c[2]+')';}
@@ -1758,7 +1766,7 @@ function draw() {
   const dark = (matchMedia('(prefers-color-scheme: dark)').matches && document.documentElement.dataset.theme !== 'light') || document.documentElement.dataset.theme === 'dark';
   const landRGB = dark ? [59, 57, 52] : [140, 133, 119];
   if (legendDark !== dark) legend(landRGB, dark);
-  const solarOn = solar.checked, showAirOn = showair.checked && atmo.checked, showPhiOn = showphi.checked, satOn = satelliteCk.checked && !!satPixels,
+  const solarOn = solar.checked, showAirOn = showair.checked && atmo.checked, showPhiOn = showphi.checked, naturalOn = naturalCk.checked, satOn = satelliteCk.checked && !!satPixels,
     showSnow = snowCk.checked && !!snow, lifeOn = lifeCk.checked && !!bloom;
   if (solarOn && frozen === 0) updateSun();
   hotCount = 0;
@@ -1768,6 +1776,7 @@ function draw() {
     let R, G, B, hot = false, snowCover = 0;
     // the surface: a sinking solid lies on the floor, so the surface is open water until the column is frozen through (it turns to ice over the last tenth); a floating solid is the surface
     const surfIce = floatMode ? phi[i] : Math.max(0, (phi[i]-0.9)*10);
+    const iceK = naturalOn && floatMode ? CRUST_MAX*Math.min(1, Math.sqrt(phi[i]/NAT_FULL)) : surfIce; // how white the surface is drawn
     if (gridI === 1 || kindI === 2 || (kindI === 1 && gridI === 0)) { // land; river channels (drawn on their own layer) and lakes look like land until the lattice reaches them
       R = landRGB[0];
       G = landRGB[1];
@@ -1788,8 +1797,27 @@ function draw() {
     else {
       const t = T[i];
       hot = gridI === 2 ? t > meltPt(phi[i], salinityOf(i))+0.5 : t >= meltPtOpen(i); // slush sits at its melting point; only water clearly above it is shown as hot
-      if (hot) {
-        if (!kindI) hotCount++;
+      if (hot && !kindI) hotCount++;
+      if (naturalOn) { // no temperature: open water, seasonal sea ice and the milky tint of a seeded sinking column; floating ice is added below
+        const shadeF = shade[i];
+        R = SEA[0]*shadeF;
+        G = SEA[1]*shadeF;
+        B = SEA[2]*shadeF;
+        const seaIceF = gridI === 0 ? seaIceCover[i]*Math.max(0, Math.min(1, 1-(t-T0[i])/3)) : 0;
+        if (seaIceF > 0) {
+          const f = 0.85*seaIceF;
+          R += (ICE[0]-R)*f;
+          G += (ICE[1]-G)*f;
+          B += (ICE[2]-B)*f;
+        }
+        if (!floatMode && phi[i] > 0) {
+          const f = MILK_MAX*Math.min(1, phi[i]/NAT_FULL);
+          R += (MILK[0]-R)*f;
+          G += (MILK[1]-G)*f;
+          B += (MILK[2]-B)*f;
+        }
+      }
+      else if (hot) {
         R = HOT[0];
         G = HOT[1];
         B = HOT[2];
@@ -1807,10 +1835,10 @@ function draw() {
           B += (ICE[2]-B)*f;
         }
       }
-      if (surfIce > 0) {
-        R += (ICE9[0]-R)*surfIce;
-        G += (ICE9[1]-G)*surfIce;
-        B += (ICE9[2]-B)*surfIce;
+      if (iceK > 0) {
+        R += (ICE9[0]-R)*iceK;
+        G += (ICE9[1]-G)*iceK;
+        B += (ICE9[2]-B)*iceK;
         if (lifeOn && bloom[i] > 0) { // drawn stronger than its albedo effect so a bloom can be seen
           const f = 0.6*bloom[i]*surfIce;
           R += (ALGAE[0]-R)*f;
@@ -1839,8 +1867,8 @@ function draw() {
       if (gridI === 1 || kindI === 2) A = Math.round(255*Math.min(1, snowCover*1.5)); // the imagery, whitened as snow covers it
       else if (kindI === 3 || kindI === 1) A = Math.round(255*Math.min(1, surfIce*1.5));
       else {
-        const a = Math.max(0, Math.min(1, (T[i]-8)/(MELT-8)));
-        A = Math.round(255*(0.45+0.55*Math.max(a, Math.min(1, surfIce*1.5), hot ? 1 : 0)));
+        const a = naturalOn ? (floatMode ? 0 : Math.min(1, phi[i]/NAT_FULL)) : Math.max(0, Math.min(1, (T[i]-8)/(MELT-8)));
+        A = Math.round(255*(0.45+0.55*Math.max(a, Math.min(1, iceK*1.5), hot && !naturalOn ? 1 : 0)));
       }
       nightMask[i] = solarOn && night[i] ? 1 : 0;
     } // night is applied as an overlay in satellite mode so the imagery darkens too
@@ -1877,6 +1905,8 @@ function legend(ld, dark) { // swatches come from the colour constants above, so
   set('lg_ice9', css(ICE9));
   set('lg_algae', css(ALGAE.map((v, k) => Math.round(ICE9[k]+(v-ICE9[k])*0.6))));
   set('lg_ice', css(ICE));
+  set('lg_sea', css(SEA));
+  set('lg_milk', css(MILK.map((v, k) => Math.round(SEA[k]+(v-SEA[k])*MILK_MAX))));
   set('lg_land', css(ld));
   const j = tempLutIndex(15);
   set('lg_night', css([TLUT[j]*NIGHT[0], TLUT[j+1]*NIGHT[1], TLUT[j+2]*NIGHT[2]].map(Math.round)));
@@ -2096,10 +2126,7 @@ function solidText() {
 }
 $('solidV').textContent = solidText();
 solidSlider.addEventListener('input', () => $('solidV').textContent = solidText());
-thermo.addEventListener('change', () => {
-  document.querySelector('.sub').textContent = 'Melting point 45.8 °C · seed crystal lattice · latent heat '+(thermo.checked ? 'on' : 'off');
-  stats();
-  });
+thermo.addEventListener('change', stats);
 solar.addEventListener('change', draw);
 showcur.addEventListener('change', blit);
 showair.addEventListener('change', draw);
@@ -2109,6 +2136,7 @@ snowCk.addEventListener('change', () => {
   draw();
 });
 showphi.addEventListener('change', draw);
+naturalCk.addEventListener('change', draw);
 depthOn.addEventListener('change', () => {
   buildWeights();
   frozenMass = 0;
