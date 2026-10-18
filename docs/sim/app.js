@@ -460,6 +460,11 @@ function openSurface(i) {
   const p = phi[i];
   return floatMode ? 1-p : p < 0.9 ? 1 : Math.max(0, (1-p)*10);
 }
+// leads: a share of a floating crust kept open by cracking (leads slider, open-water equivalent). They spray crystals, count as open sea for
+// evaporation and are dark; their heat comes from the deep layer (leadStep). Not used for the wind's grip on the gyres, which a cracked crust still blocks.
+const LEAD_STEPS = [0, 0.001, 0.002, 0.003, 0.005, 0.01, 0.02, 0.03, 0.05];
+function leadShare() {return floatMode ? LEAD_STEPS[leadsSlider.value] : 0;}
+function leadOpen(i, lead) {return lead > 0 && kind[i] === 0 && grid[i] === 2 ? Math.max(lead, openSurface(i)) : openSurface(i);}
 // the gyres are wind-driven: by Sverdrup balance a gyre's transport scales with the wind stress over its basin, so with the basin's open surface share; locally there is no flow under ice
 const systemOpen = new Float64Array(9);
 function updateSystems() {
@@ -680,7 +685,7 @@ const playBtn = $('play'), rateSlider = $('rate'), speedSlider = $('speed'), lat
   solar = $('solar'), mixSlider = $('mix'), atmo = $('atmo'), airborne = $('airborne'), depthOn = $('depthOn'),
   resSel = $('res'), currents = $('currents'), showcur = $('showcur'), showair = $('showair'), showphi = $('showphi'), naturalCk = $('natural'),
   solidSlider = $('solid'), globeCk = $('globe'), satelliteCk = $('satellite'), floatsCk = $('floats'), snowCk = $('snowfall'), greenhouseCk = $('greenhouse'), cloudsCk = $('clouds'), lifeCk = $('life'), washSlider = $('wash'), loftSlider = $('loft'),
-  threshSlider = $('thresh');
+  threshSlider = $('thresh'), leadsSlider = $('leads');
 // natural-colour relief base (NOAA ETOPO1), loaded once; drawn beneath the simulation in satellite mode
 const satCanvas = document.createElement('canvas');
 satCanvas.width = BW;
@@ -840,7 +845,7 @@ function updateSunWeights() {
 }
 let seaWhite = 0; // share of the ocean surface that is white ice-nine (the floating crust, or a sinking column frozen through, as drawn), weighted by what the clouds let through
 function updateRowSea() {
-  const stride = Math.max(1, RES>>1);
+  const stride = Math.max(1, RES>>1), crustWhite = 1-leadShare(); // leads are dark
   let wSum = 0, aSum = 0;
   for (let ra = 0; ra < AH; ra++) {
     let s = 0, n = 0;
@@ -851,7 +856,7 @@ function updateRowSea() {
         if (grid[i] === 1 || kind[i]) continue;
         s += T[i]-seaRef(i); // the surface's warming: a stratified sinking column's anomaly, a mixed column's departure from today's surface
         n++;
-        wSum += c*(floatMode ? phi[i] : Math.max(0, (phi[i]-0.9)*10))*cloudMask(cloud[airCell[i]])*sunW[ra]*(lifeCk.checked ? 1-BIO_DARK*bloom[i] : 1); // as seen from space
+        wSum += c*(floatMode ? Math.min(phi[i], crustWhite) : Math.max(0, (phi[i]-0.9)*10))*cloudMask(cloud[airCell[i]])*sunW[ra]*(lifeCk.checked ? 1-BIO_DARK*bloom[i] : 1); // as seen from space
         aSum += c;
       }
     }
@@ -983,15 +988,16 @@ function snowClear() {
 // water vapour, rain and clouds (always, with the atmosphere), and the crystals (with snowfall)
 function vapourStep(h) {
   // crystals: lofted from seeded water, carried with the air (airStep), washed out by rain
-  const snowOn = snowCk.checked, cloudsOn = cloudsCk.checked;
+  const snowOn = snowCk.checked, cloudsOn = cloudsCk.checked, lead = leadShare();
   crystalSrc.fill(0);
   seaCovered.fill(0);
   for (let k = 0; k < frozenN; k++) {
     const i = frozenList[k];
     if (grid[i] === 2 && kind[i] === 0) {
       const a = airCell[i];
-      crystalSrc[a] += openSurface(i); // spray comes off open water and slush, not a closed crust
-      seaCovered[a] += 1-openSurface(i);
+      const open = leadOpen(i, lead);
+      crystalSrc[a] += open; // spray comes off open water, slush and leads, not a closed crust
+      seaCovered[a] += 1-open;
     }
   }
   // water vapour: each air cell gets today's evaporation from its open sea plus the anomalous latent flux of this tick, and rains out on TAU_V;
@@ -1310,6 +1316,28 @@ function deepStep(i, growMax, latK, h) {
       Td[i] = latentStep(Td[i], p, -dPhi, latK);
       frozenMass -= dPhi*capDeep*area;
     }
+  }
+}
+// floats mode, leads: where the crust covers more than 1-lead, the missing open share exposes the deep layer's liquid (at its melting point under a
+// closed crust) to the air at the bulk rates of the surface step, toward the same air-shifted target; the turbulent part goes to the air (sensible
+// to airIn, latent with the vapour), the longwave part leaves directly. The deep layer then freezes against the crystals (deepStep). Leads only shed
+// heat. Runs after the heat loop on every substep, since airIn is cleared at its start.
+function leadStep(h, lead) {
+  for (let k = 0; k < frozenN; k++) {
+    const i = frozenList[k];
+    if (grid[i] !== 2 || kind[i] !== 0 || !(capd[i] > 0) || phid[i] >= 0.999) continue;
+    const f = lead-(1-phi[i]);
+    if (f <= 0) continue;
+    const r = (i/W)|0, a = airCell[i], dTa = airT[a]-airTclim[a], t0 = Td[i];
+    const ht = H_SENS+hLat(t0), hx = ht+H_LW, cp = ht/hx, ref = seaRef(i), seasonSea = 3*sinLat[r]*season;
+    const heatDeep = capd[i]*(1-0.5*phid[i]), target = ref+cp*dTa+seasonSea;
+    const t = target+(t0-target)*Math.exp(-f*hx*KC*h/heatDeep);
+    if (t >= t0) continue;
+    const lost = (t0-t)*heatDeep, v = lost*airShare(ht, hx, cp, t0-ref-seasonSea, dTa);
+    Td[i] = t;
+    airIn[a] += v*H_SENS/ht;
+    evapAnom[a] += v*(ht-H_SENS)/ht;
+    budget.sea += (lost-v)*cosLat[r];
   }
 }
 function trySeed(i, n, thermoOn, probIdx) {
@@ -1637,6 +1665,7 @@ function step(h, last) { // last: the substep count on the tick's final substep,
       }
     }
     T.set(Tnext);
+    if (floatMode && atmoOn && leadShare() > 0) leadStep(h, leadShare());
     if (atmoOn && last) {
       vapourStep(h*last);
       if (snowCk.checked) snowStep(h*last);
@@ -2212,6 +2241,12 @@ function solidText() {
   return v.toFixed(v < 10 ? 1 : 0)+' m/h';
 }
 $('solidV').textContent = solidText();
+function leadsText() {
+  const v = LEAD_STEPS[leadsSlider.value];
+  return v ? +(v*100).toFixed(1)+'% open' : 'sealed';
+}
+$('leadsV').textContent = leadsText();
+leadsSlider.addEventListener('input', () => $('leadsV').textContent = leadsText());
 solidSlider.addEventListener('input', () => $('solidV').textContent = solidText());
 thermo.addEventListener('change', stats);
 solar.addEventListener('change', draw);
@@ -2251,6 +2286,7 @@ function rebuild() {
 resSel.addEventListener('change', rebuild);
 function floatsUI() {
   depthOn.disabled = floatsCk.checked;
+  leadsSlider.disabled = !floatsCk.checked;
   $('deepV').hidden = !floatsCk.checked;
 }
 floatsUI();
@@ -2360,6 +2396,7 @@ function onPointerUp(e) {
 mapBox.addEventListener('pointerup', onPointerUp);
 mapBox.addEventListener('pointercancel', onPointerUp);
 mapBox.addEventListener('wheel', e => {
+  if (!e.cancelable) return; // a scroll that began on the page and slid onto the map stays latched to the page: zooming too would do both
   e.preventDefault();
   const [x, y] = toDevicePx(e);
   setZoom(zoom*(e.deltaY < 0 ? 1.15 : 1/1.15), x, y);

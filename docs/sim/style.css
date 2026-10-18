@@ -27,7 +27,7 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(26px,4vw,38px);mar
 .home:hover{color:var(--accent)}
 .mapbox{position:relative;user-select:none;-webkit-user-select:none;border:1px solid var(--line);background:var(--ocean);}
 .mapbox.globe{background:#06090f}
-.mapbox{overflow:hidden;max-width:100%;aspect-ratio:2/1;cursor:crosshair}
+.mapbox{overflow:hidden;max-width:100%;aspect-ratio:2/1;cursor:crosshair;touch-action:none;overscroll-behavior:contain}
 canvas{display:block;width:100%;height:100%;touch-action:none}
 .zoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:4px}
 .viewsw{position:absolute;left:8px;top:8px;display:flex;gap:4px}

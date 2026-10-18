@@ -10,7 +10,7 @@ const mk = id => els[id] ??= { id, checked: true, value: '50', textContent:'', i
   addEventListener:(t,f)=>{(listeners[id+':'+t] ??= []).push(f);} };
 mk('res').options=['1','2','4','8'].map(v=>({value:v,remove(){}}));
 const E=(k,d)=>process.env[k]??d, B=(k,d)=>(process.env[k]??d)==='1';
-const defaults = { speed, rate:E('RATE','51'), lat:E('LAT','93'), cool:E('COOL','4'), solid:E('SOLID','0'), mix:E('MIX','4'), res, globe:false, satellite:false, showcur:false, showair:false, showphi:false,
+const defaults = { speed, rate:E('RATE','51'), lat:E('LAT','93'), cool:E('COOL','4'), solid:E('SOLID','0'), mix:E('MIX','4'), leads:E('LEADS','0'), res, globe:false, satellite:false, showcur:false, showair:false, showphi:false,
   solar: solarOn==='1', floats:B('FLOATS','0'), thermo:B('THERMO','1'), atmo:B('ATMO','1'), currents:B('CURRENTS','1'), airborne:B('AIRBORNE','1'), depthOn:B('DEPTH','1'), snowfall:B('SNOW','1'), greenhouse:B('GH','1'), clouds:B('CLOUDS','1'), life:B('LIFE','0') };
 for (const [k,v] of Object.entries(defaults)) { const e = mk(k); if (typeof v === 'boolean') e.checked = v; else e.value = v; }
 globalThis.document = { getElementById: mk, createElement: () => ({ ...mk('c'+Math.random()), getContext:()=>ctx2d }), documentElement:{dataset:{}}, querySelector:()=>mk('sub') };

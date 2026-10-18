@@ -3,7 +3,7 @@
 # airstudy.mjs args: <appDir> <steps> <res> <speed> <day/night 0|1> <out.json>
 #   res: cells per degree (1, 2 = 0.5 deg, 4, 8); speed: slider value, hours per step = 10^(speed/100*2.68-1)
 #   (100 = 48 h, 78 = 12 h, 49 = 2 h, 37 = 1 h); 2200 steps at 48 h = 12 years.
-# Outputs: sweep/ (25 scenarios), hourly/, conv/, snow/ (54 snow sweep runs), maps/, site/.
+# Outputs: sweep/ (25 scenarios, 9 air-transport runs, 9 lead runs), hourly/, conv/, snow/ (54 snow sweep runs), maps/, site/.
 # The 12-year 0.5 deg runs take hours each; the 2 h convergence runs take longest.
 # PART=k/n runs every n-th job starting at job k (0-based), to split the list across machines.
 # usage: [PART=k/n] [JOBS=n] tools/runs/jobs.sh [WORK]
@@ -42,6 +42,12 @@ air "FLOATS=1 SNOW=0" "" 1 nosnow_floats
 air "FLOATS=1 GH=0" "" 1 nogh_floats
 air "FLOATS=1 CLOUDS=0" "" 1 noclouds_floats
 air "FLOATS=1 LIFE=1" "" 1 life_floats
+# air transport sweep: the mixing slider scales eddy diffusion and wind together (4 = 1x; 1, 2, 8, 10 = 0.25x, 0.5x, 2x, 2.5x)
+for m in 1 2 8 10; do air "FLOATS=0 MIX=$m" "" 1 mix${m}_sinks; air "FLOATS=1 MIX=$m" "" 1 mix${m}_floats; done
+air "FLOATS=1 CURRENTS=0 AIRBORNE=0" "" 1 nocurrents_floats
+# leads in the floating crust: the leads slider (LEADS 1, 3, 4, 5, 7, 8 = 0.1, 0.3, 0.5, 1, 3, 5% open); clouds off at 1, 3 and 5%
+for v in 1 3 4 5 7 8; do air "FLOATS=1 LEADS=$v" "" 1 leads${v}_floats; done
+for v in 5 7 8; do air "FLOATS=1 LEADS=$v CLOUDS=0" "" 1 leads${v}_noclouds_floats; done
 # hourly, 0.25 deg: first 90 days, and the day/night comparison
 for c in "0 sinks" "1 floats"; do set -- $c; echo "env FLOATS=$1 node $HERE/airstudy.mjs $A 2200 4 37 1 $W/hourly/cmp_$2.json > /dev/null" >> "$J"; done
 echo "env FLOATS=0 node $HERE/airstudy.mjs $A 1500 4 37 1 $W/hourly/air_on.json > /dev/null" >> "$J"

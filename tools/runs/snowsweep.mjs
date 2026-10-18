@@ -10,7 +10,7 @@ const els = {}, listeners = {};
 const ctx2d = {createImageData:(w,h)=>({width:w,height:h,data:new Uint8ClampedArray(w*h*4)}),putImageData(){},getImageData:(x,y,w,h)=>({data:new Uint8ClampedArray(w*h*4)}),drawImage(){},setTransform(){},clearRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},fill(){},closePath(){},arc(){},setLineDash(){}};
 const mk = id => els[id] ??= {id,checked:true,value:'50',textContent:'',innerHTML:'',hidden:false,disabled:false,style:{},className:'',tagName:'DIV',width:0,height:0,clientWidth:200,clientHeight:40,classList:{toggle(){}},getContext:()=>ctx2d,getBoundingClientRect:()=>({left:0,top:0,width:1440,height:720}),setPointerCapture(){},closest:()=>null,addEventListener:(t,f)=>{(listeners[id+':'+t]??=[]).push(f);}};
 mk('res').options = [];
-for (const [k,v] of Object.entries({speed:'100',rate:'51',lat:'93',cool:'4',solid:'0',mix:'4',res:'1',globe:false,satellite:false,showcur:false,showair:false,showphi:false,floats:false,life:false,snowfall:true,
+for (const [k,v] of Object.entries({speed:'100',rate:'51',lat:'93',cool:'4',solid:'0',mix:'4',leads:'0',res:'1',globe:false,satellite:false,showcur:false,showair:false,showphi:false,floats:false,life:false,snowfall:true,
   wash:String(50-50*Math.log10(WASH)/Math.log10(7)), loft:String(50+50*Math.log10(1/LOFT)/2), thresh:String(50+50*Math.log10(THRESH)/2)})) {const e = mk(k); if (typeof v === 'boolean') e.checked = v; else e.value = v;}
 globalThis.document = {getElementById:mk,createElement:()=>({...mk('c'+Math.random()),getContext:()=>ctx2d}),documentElement:{dataset:{}},querySelector:()=>mk('sub')};
 globalThis.matchMedia = () => ({matches:false,addEventListener(){}}); globalThis.MutationObserver = class{observe(){}}; globalThis.ResizeObserver = class{observe(){}};
