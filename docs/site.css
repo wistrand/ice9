@@ -107,4 +107,7 @@ th { color: var(--muted); font-weight: 600; }
 /* grid items may not grow past their track: a large image would otherwise widen the page */
 .hero .wrap > *, .lanes > *, .cards > *, .pair > *, .cols > *, .globes > * { min-width: 0; }
 
+.quote { margin: 0 0 24px; padding: 4px 0 4px 20px; border-left: 3px solid var(--line); max-width: 46em; }
+.quote p { margin: 0 0 8px; font-family: var(--serif); font-size: 18px; }
+.quote cite { font-size: 13px; color: var(--muted); font-style: normal; }
 footer { border-top: 1px solid var(--line); padding: 28px 0 48px; font-size: 13px; color: var(--muted); }
