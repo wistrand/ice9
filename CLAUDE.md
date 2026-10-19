@@ -16,7 +16,7 @@ and paints the result to a canvas (flat map or orthographic globe).
 |-------------------------------|--------------------------------------------------------------------------------------------------------------------|
 | `docs/index.html`             | the project website (landing page): timeline, findings, render gallery, model summary, paper link                  |
 | `docs/site.css`               | website styles (system fonts, light/dark tokens); `docs/img/` holds the renders, `docs/paper/` the PDF and figures |
-| `docs/sim/index.html`         | markup: map box, legend, run bar, stats grid, controls, explanatory notes                                          |
+| `docs/sim/index.html`         | markup: map box, legend, run bar, stats grid, controls, a link to the website and paper                            |
 | `docs/sim/style.css`          | layout and theme tokens (light/dark via `prefers-color-scheme` and `data-theme`)                                   |
 | `docs/sim/app.js`             | the whole app: data load, model, rendering, UI wiring (one async IIFE)                                             |
 | `docs/sim/data/cells.bin`     | 2880x1440 (0.125°) cell mask, raw zlib stream (format in architecture doc)                                         |
