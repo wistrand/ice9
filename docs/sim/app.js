@@ -2332,7 +2332,9 @@ globeCk.addEventListener('change', () => {
   });
 // ===== pointer input =====
 const mapBox = $('mapbox'), pointers = new Map();
-let drag = null, pinch = null;
+let drag = null, pinch = null, wheelAt = -1e9;
+// the model holds while the map is dragged, pinched or wheel-zoomed, so the view follows the hand: a tick can take far longer than a frame on fine grids or long steps
+function interacting() {return !!pinch || !!(drag && drag.moved) || performance.now()-wheelAt < 250;}
 function toDevicePx(e) {
   const b = mapCanvas.getBoundingClientRect();
   return [(e.clientX-b.left)*dpr, (e.clientY-b.top)*dpr];
@@ -2398,6 +2400,7 @@ mapBox.addEventListener('pointercancel', onPointerUp);
 mapBox.addEventListener('wheel', e => {
   if (!e.cancelable) return; // a scroll that began on the page and slid onto the map stays latched to the page: zooming too would do both
   e.preventDefault();
+  wheelAt = performance.now();
   const [x, y] = toDevicePx(e);
   setZoom(zoom*(e.deltaY < 0 ? 1.15 : 1/1.15), x, y);
   }, {passive:false});
@@ -2407,7 +2410,7 @@ mapBox.addEventListener('wheel', e => {
 const DRAW_SHARE = 0.2;
 let lastStatsAt = 0, lastDrawAt = 0, drawCost = 0;
 function loop(ts) {
-  if (running) {
+  if (running && !interacting()) {
     tick();
     const now = performance.now();
     if (now-lastDrawAt > Math.max(45, drawCost/DRAW_SHARE)) {

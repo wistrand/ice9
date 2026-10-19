@@ -14,6 +14,8 @@ globalThis.fetch = async u => new Response(fs.readFileSync(path.join(appDir, u))
 const src = fs.readFileSync(path.join(appDir, 'app.js'), 'utf8');
 await (0,eval)(src.replace(/^\(async function\(\) ?\{/, 'globalThis.__app=(async function(){globalThis.__ev=s=>eval(s);')); await globalThis.__app;
 const E = s => globalThis.__ev(s);
+// PRINT_PHI=1: a near-white solid-fraction ramp for print, where the sim's purple ramp is too close to the sea; the sim keeps its own colours
+if (process.env.PRINT_PHI === '1') E('PLUT.set(rampLUT([[0, oklch(0.86, 0.02, 250)], [1, oklch(0.99, 0, 0)]], 0, 1, 101))');
 globalThis.__sat = new Uint8ClampedArray(fs.readFileSync(satRaw).buffer.slice(0));
 function png(file, w, h, rgba, alpha) {
   const ch = alpha ? 4 : 3, raw = Buffer.alloc((w*ch+1)*h);

@@ -5,7 +5,7 @@ that freezes water at 45.8 °C, spreading through the world's oceans, plus a pap
 website with the results. Live at <https://ice9.world> (simulation at <https://ice9.world/sim/>).
 
 <p align="center">
-  <img src="paper/fig/globe_sinks_48h.png" width="420" alt="Sinking ice-nine two days after a seed in the Caribbean: the North Atlantic and eastern Pacific shaded purple by solid fraction">
+  <img src="paper/fig/globe_sinks_48h.png" width="420" alt="Sinking ice-nine two days after a seed in the Caribbean: the North Atlantic and eastern Pacific shaded white by solid fraction">
   <br><em>Sinking ice-nine two days after a single seed in the Caribbean, coloured by the solid fraction of each column (the paper's title figure).</em>
 </p>
 
