@@ -1681,7 +1681,7 @@ function fit() {
   dpr = globeCk.checked ? 1 : Math.min(2, devicePixelRatio || 1);
   mapCanvas.width = Math.round(b.width*dpr);
   mapCanvas.height = Math.round(b.height*dpr);
-  baseScale = mapCanvas.width/W;
+  baseScale = Math.max(mapCanvas.width/W, mapCanvas.height/H); // the map covers the box: equal in the 2:1 page box, wider or taller in full screen
   clampPan();
 }
 function clampPan() {
@@ -2332,6 +2332,13 @@ globeCk.addEventListener('change', () => {
   });
 // ===== pointer input =====
 const mapBox = $('mapbox'), pointers = new Map();
+// full screen for the map box (the ResizeObserver refits the canvas); hidden where the browser cannot do it for an element (iPhone Safari)
+const requestFull = mapBox.requestFullscreen || mapBox.webkitRequestFullscreen;
+$('zfull').hidden = !requestFull;
+$('zfull').addEventListener('click', () => {
+  if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  else requestFull.call(mapBox);
+  });
 let drag = null, pinch = null, wheelAt = -1e9;
 // the model holds while the map is dragged, pinched or wheel-zoomed, so the view follows the hand: a tick can take far longer than a frame on fine grids or long steps
 function interacting() {return !!pinch || !!(drag && drag.moved) || performance.now()-wheelAt < 250;}

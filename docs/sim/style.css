@@ -29,6 +29,8 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(26px,4vw,38px);mar
 .mapbox.globe{background:#06090f}
 .mapbox{overflow:hidden;max-width:100%;aspect-ratio:2/1;cursor:crosshair;touch-action:none;overscroll-behavior:contain}
 canvas{display:block;width:100%;height:100%;touch-action:none}
+.mapbox:fullscreen{aspect-ratio:auto;max-width:none;border:0}
+.mapbox:-webkit-full-screen{aspect-ratio:auto;max-width:none;border:0;width:100%;height:100%}
 .zoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:4px}
 .viewsw{position:absolute;left:8px;top:8px;display:flex;gap:4px}
 .viewsw label{cursor:pointer}.viewsw input{position:absolute;opacity:0;width:0;height:0}
@@ -46,6 +48,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
 .stat{background:var(--panel);border:1px solid var(--line);padding:10px 12px;min-width:0;overflow:hidden}
 .stat .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stat .v{font-family:var(--display);font-size:clamp(18px,2.6vw,26px);font-weight:500;font-variant-numeric:tabular-nums;line-height:1.15;margin-top:4px;white-space:nowrap;overflow:hidden;min-height:1.15em}
+.stat .v~.k{white-space:normal;line-height:1.4;margin-top:4px}
 .stat .v small{font-family:var(--mono);font-size:11px;color:var(--muted)}
 .spark{display:block;width:100%;height:34px;margin-top:6px}
 .meter{height:6px;background:var(--line);margin-top:8px;overflow:hidden}
