@@ -12,7 +12,7 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 W=${1:-$HERE/work}
 A=$W/app
 cd "$W"
-mkdir -p sweep hourly conv snow maps site site_nat
+mkdir -p sweep hourly conv snow maps site site_nat site_phi
 J=$W/jobs.txt
 : > "$J"
 air() { echo "env $1 node $HERE/airstudy.mjs ${2:-$A} 2200 2 100 ${3:-1} $W/sweep/$4.json > /dev/null" >> "$J"; }
@@ -85,6 +85,8 @@ for c in "0 sinks" "1 floats"; do set -- $c
   echo "env NATURAL=1 node $HERE/siterender.mjs $A $1 $W/site_nat/$2 $W/sat.rgba > /dev/null" >> "$J"
   echo "env NATURAL=1 DAILY=15 VIEWS=atlantic SPEED=49 node $HERE/siterender.mjs $A $1 $W/site_nat/$2 $W/sat.rgba > /dev/null" >> "$J"
 done
+# paper title figure: sinking case after two days, solid fraction over natural colour on the Atlantic globe (no satellite relief), 10-minute steps
+echo "env NATURAL=1 SATELLITE=0 SHOWPHI=1 DAILY=2 VIEWS=atlantic SPEED=8 node $HERE/siterender.mjs $A 0 $W/site_phi/sinks $W/sat.rgba > /dev/null" >> "$J"
 if [ -n "$PART" ]; then
   awk -v k="${PART%/*}" -v n="${PART#*/}" '(NR-1)%n==k' "$J" > "$J.part"
   mv "$J.part" "$J"

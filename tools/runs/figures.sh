@@ -22,6 +22,7 @@ cp "$W/maps/m_f_40.png" map_floats_80d.png
 cp "$W/maps/m_os_1500.png" overlay_sinks_8y.png
 cp "$W/maps/m_of_1500.png" overlay_floats_8y.png
 cp "$W/maps/depth_table.txt" depth_table.txt
+cp "$W/site_phi/sinks_day02_globe_atlantic.png" globe_sinks_48h.png
 cp timeline.png "$ROOT/docs/paper/timeline.png"
 # website images: stills and the first-weeks animations
 # stills: temperature view as {case}_{stage}_*.webp, natural colour as nat_{case}_{stage}_*.webp;

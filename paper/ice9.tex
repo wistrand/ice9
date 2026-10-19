@@ -16,28 +16,33 @@
 
 \title{Freezing of the world ocean by ice-nine\\[4pt]\large A scenario study with a global column model}
 \author{Erik Wistrand}
-\date{18 October 2026}
+\date{19 October 2026}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Ice-nine, from Vonnegut's \emph{Cat's Cradle}, is a solid phase of water that melts at 45.8~\degC. We simulate its spread through the world ocean after a single seed, using a global grid model with latent heat, bulk air-sea exchange, a seasonal atmosphere with a water-vapour greenhouse and clouds, and snowfall of ice-nine. We run 25 scenarios for twelve simulated years, changing one assumption at a time, and test convergence in grid size, time step and random seed. With latent heat, 39\% of the ocean by mass freezes within about a week and freezing then nearly stops: the ocean is 44\% frozen after twelve years. The speed comes from rain: crystals lofted by sea spray freeze the rain they meet, and that rain seeds the sea, lakes and rivers far ahead of the contact front. The same rain falls on land as ice-nine snow, and most land is white within two weeks. The latent heat sets the size of the first phase (26\% at 669~kJ/kg, 51\% at 334~kJ/kg). Whether ice-nine sinks or floats decides the end state. A sinking solid leaves an open slush ocean near 42~\degC\ with the air near 35~\degC\ after twelve years. A floating solid closes a crust after 5.8 years; brine rejected by the crust overturns the water column, so the deep ocean freezes to its limit within about two years; the air falls below today's temperature after 4.7 years and reaches $-37$~\degC\ after twelve. Clouds account for about 20~K of that cooling. The crust is assumed sealed; leads covering 1\% of it would leave the air 19~K warmer.
+Ice-nine, from Vonnegut's \emph{Cat's Cradle}, is a solid phase of water that melts at 45.8~\degC. We simulate its spread through the world ocean from a single seed with a global grid model that includes latent heat, air-sea exchange, a seasonal atmosphere with water vapour and clouds, and snowfall of ice-nine, in 25 twelve-year scenarios. Latent heat stops the freeze: 39\% of the ocean by mass freezes within a week, seeded far ahead of the front by rain that airborne crystals have frozen, and 44\% after twelve years. The same rain whitens most land within two weeks. Whether ice-nine sinks or floats decides the end. A sinking solid leaves an open slush ocean near 42~\degC\ under air near 35~\degC. A floating solid closes a crust after 5.8 years and cools the air to $-37$~\degC\ after twelve, about 20~K of it through clouds; leads covering 1\% of the crust would leave the air 19~K warmer.
 \end{abstract}
-
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=\textwidth]{timeline.png}
-\caption{Timeline of the two baseline scenarios (0.5\degree\ grid, single seed in the Caribbean, front speed 15~km/h), on a logarithmic time axis. Each panel shows the ocean frozen (by mass; for the floating case also the share of the surface under crust) and the mean air temperature. Thick lines: the twelve-year runs with 48-hour steps. Thin lines: three-year runs with 2-hour steps, which resolve the first weeks (Section~\ref{sec:conv}). Events up to year 3 are taken from the 2-hour runs, later ones from the 48-hour runs. The yearly oscillation in air temperature is the seasonal cycle.}
-\label{fig:timeline}
-\end{figure}
 
 \section{Introduction}
 
-In the novel, a crystal of ice-nine falls into the sea and the oceans freeze almost at once. Seawater at 0--30~\degC\ is 15--45~K below the melting point of the new phase, so contact growth is plausible. Freezing, however, releases latent heat, and that heat has to go somewhere. This paper asks how much of the ocean freezes, how fast, what limits it, and what happens to the air and the land. Figure~\ref{fig:timeline} summarises the course of events in both scenarios.
+\noindent
+\begin{minipage}[t]{0.56\textwidth}
+\setlength{\parindent}{1.5em}
+\noindent In the novel, a crystal of ice-nine falls into the sea and the oceans freeze almost at once. Seawater at 0--30~\degC\ is 15--45~K below the melting point of the new phase, so contact growth is plausible. Freezing, however, releases latent heat, and that heat has to go somewhere. This paper asks how much of the ocean freezes, how fast, what limits it, and what happens to the air and the land. Figure~\ref{fig:timeline} summarises the course of events in both scenarios.
 
 The idea is older than the novel. Vonnegut worked in public relations at General Electric in Schenectady from 1947, where his brother Bernard worked in Irving Langmuir's group on seeding supercooled clouds with dry ice and silver iodide. By Vonnegut's own account, ice-nine was Langmuir's: a laboratory legend had it that Langmuir, assigned to host H.\,G.\ Wells on a visit to Schenectady, offered him the idea of ``a form of ice that was stable at room temperature'' for a story; Wells never used it, and after Wells (1946) and Langmuir (1957) had died, Vonnegut took it (``Finders, keepers''), making Langmuir the model for Felix Hoenikker (Vonnegut, \emph{The Paris Review} 69, 1977). Elsewhere the idea is credited to Bernard Vonnegut (\emph{Physics Today} 39(11), 1986). The melting point of 45.8~\degC\ is the novel's own; we found no source for the number.
+\end{minipage}\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{0pt}
+\centering
+\includegraphics[width=\linewidth]{globe_sinks_48h.png}
+\captionof{figure}{Sinking ice-nine two days after a seed in the Caribbean (0.5\degree\ grid, 10-minute steps). Purple: solid fraction, dark at 0 to light at 100\%. Rain carrying crystals has seeded the North Atlantic and the eastern Pacific far ahead of the contact front, which has moved about 700~km; the ocean is 5\% frozen by mass.}
+\label{fig:title}
+\end{minipage}
 
+\clearpage
 \subsection*{Main findings}
 
 \begin{enumerate}
@@ -50,6 +55,14 @@ The idea is older than the novel. Vonnegut worked in public relations at General
 \item \textbf{Leads weaken the snowball.} The floating results assume a sealed crust. Keeping 0.3\% of the crust open as leads warms the air after twelve years by 8~K, 1\% by 19~K: the deep water under the crust is near 42~\degC, and the vapour from the leads keeps the clouds. A plausible open-water equivalent of 0.15--0.9\% puts the end state between about $-33$ and $-20$~\degC\ (Section~\ref{sec:leads}).
 \item \textbf{Front speed, currents, bathymetry and the diurnal cycle} change the first weeks but not the twelve-year result.
 \end{enumerate}
+
+\clearpage
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\textwidth]{timeline.png}
+\caption{Timeline of the two baseline scenarios (0.5\degree\ grid, single seed in the Caribbean, front speed 15~km/h), on a logarithmic time axis. Each panel shows the ocean frozen (by mass; for the floating case also the share of the surface under crust) and the mean air temperature. Thick lines: the twelve-year runs with 48-hour steps. Thin lines: three-year runs with 2-hour steps, which resolve the first weeks (Section~\ref{sec:conv}). Events up to year 3 are taken from the 2-hour runs, later ones from the 48-hour runs. The yearly oscillation in air temperature is the seasonal cycle.}
+\label{fig:timeline}
+\end{figure}
 
 \section{Model}
 \label{sec:model}

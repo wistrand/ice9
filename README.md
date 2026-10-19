@@ -5,9 +5,8 @@ that freezes water at 45.8 °C, spreading through the world's oceans, plus a pap
 website with the results. Live at <https://ice9.world> (simulation at <https://ice9.world/sim/>).
 
 <p align="center">
-  <img src="docs/img/anim_sinks_globe.webp" width="320" alt="Sinking ice-nine over the first 15 days: the sea turns milky as crystals spread, the land turns white">
-  <img src="docs/img/anim_floats_globe.webp" width="320" alt="Floating ice-nine over the first 15 days: a white crust spreads over the sea">
-  <br><em>The first 15 days in natural colour: sinking ice-nine (left), floating (right).</em>
+  <img src="paper/fig/globe_sinks_48h.png" width="420" alt="Sinking ice-nine two days after a seed in the Caribbean: the North Atlantic and eastern Pacific shaded purple by solid fraction">
+  <br><em>Sinking ice-nine two days after a single seed in the Caribbean, coloured by the solid fraction of each column (the paper's title figure).</em>
 </p>
 
 Drop a seed in the water and watch the lattice advance. Freezing releases latent heat
