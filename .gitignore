@@ -12,6 +12,7 @@ __pycache__/
 .DS_Store
 *~
 *.swp
+.idea/
 
 # paper run outputs (tools/runs/jobs.sh)
 tools/runs/work/
